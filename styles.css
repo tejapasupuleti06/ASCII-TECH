@@ -866,7 +866,7 @@ body.menu-open .menu-toggle[aria-expanded="true"] .line-bot {
 }
 
 .crafted-track {
-  height: 250vh;
+  height: 160vh;
   position: relative;
   width: 100%;
   background-color: var(--color-primary);
@@ -993,6 +993,9 @@ body.menu-open .menu-toggle[aria-expanded="true"] .line-bot {
 
 /* Responsive optimization matching Crafted from Imagination1.html */
 @media (max-aspect-ratio: 1/1), (max-width: 900px) {
+  .crafted-track {
+    height: 145vh;
+  }
   .crafted-layout {
     width: 100vw;
     height: 100vh;
@@ -1724,17 +1727,24 @@ body.pdf-modal-open {
     align-items: baseline;
   }
 
-  /* Services list: right-aligned, 2.5rem above headline */
+  /* Services badge on mobile: top-right corner frosted card with brand orange text */
   .hero-services {
-    display: block;
+    display: flex;
     position: absolute;
+    top: clamp(72px, 8.5vh, 90px);
+    bottom: auto;
     left: auto;
     right: 20px;
-    bottom: calc(100% + 2.5rem);
     text-align: right;
-    pointer-events: none;
+    pointer-events: auto;
     z-index: 10;
     white-space: nowrap;
+  }
+
+  .hero-services-box {
+    padding: 8px 14px;
+    border-radius: 8px;
+    background: rgba(17, 17, 17, 0.55);
   }
 
   .hero-services-list {
@@ -1743,11 +1753,13 @@ body.pdf-modal-open {
   }
 
   .hero-services-list li {
-    font-size: 1.15rem;
+    font-size: clamp(0.74rem, 2.8vw, 0.88rem);
     font-weight: 500;
     line-height: 1.35;
-    color: hsl(0, 0%, 90%);
+    color: var(--color-accent) !important;
     text-align: right;
+    opacity: 1 !important;
+    transform: none !important;
   }
 
   /* Headline: two lines, both left-aligned, spanning full content width */

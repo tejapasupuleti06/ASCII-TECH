@@ -541,6 +541,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  let lastTappedBrandCard = null;
+
   brandCards.forEach((card) => {
     const link = card.querySelector('.brand-card-link');
     const pdfUrl = card.getAttribute('data-pdf') || (link ? link.getAttribute('href') : null);
@@ -566,22 +568,31 @@ document.addEventListener('DOMContentLoaded', () => {
       setBrandActive(card);
     });
 
-    // Clicking / tapping anywhere on card or link directly opens the PDF
-    card.addEventListener('click', (e) => {
+    // Unified activation handler: on mobile, 1st tap selects, 2nd tap on active opens PDF
+    function handleCardActivation(e) {
       e.preventDefault();
+      e.stopPropagation();
       clearTimeout(brandHoverTimer);
-      setBrandActive(card);
-      openPdf(pdfUrl, title);
-    });
 
-    if (link) {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        clearTimeout(brandHoverTimer);
+      if (isMobileDevice()) {
+        if (lastTappedBrandCard === card && card.classList.contains('is-active')) {
+          // Second tap on the active card -> open brand deck PDF
+          openPdf(pdfUrl, title);
+        } else {
+          // First tap -> select and expand
+          lastTappedBrandCard = card;
+          setBrandActive(card);
+        }
+      } else {
+        // Desktop: select and open PDF in modal
         setBrandActive(card);
         openPdf(pdfUrl, title);
-      });
+      }
+    }
+
+    card.addEventListener('click', handleCardActivation);
+    if (link) {
+      link.addEventListener('click', handleCardActivation);
     }
   });
 
@@ -634,13 +645,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
     function clampVal(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
 
-    let ticking = false;
     function updateCrafted() {
-      ticking = false;
       const rect = craftedTrack.getBoundingClientRect();
+      // Skip updates if track is far out of view
+      if (rect.bottom < -100 || rect.top > window.innerHeight + 100) return;
+
       const maxScroll = craftedTrack.offsetHeight - window.innerHeight;
       const scrolled = -rect.top;
-      const p = maxScroll > 0 ? clampVal(scrolled / (maxScroll * 0.65)) : 0;
+      // Map progress so all 5 photos finish right as the track completes, eliminating dead scroll space
+      const p = maxScroll > 0 ? clampVal(scrolled / (maxScroll * 0.94)) : 0;
 
       its.forEach((el, i) => {
         const c = cfg[i];
@@ -659,10 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function onScrollCrafted() {
-      if (!ticking) {
-        requestAnimationFrame(updateCrafted);
-        ticking = true;
-      }
+      updateCrafted();
     }
 
     window.addEventListener('scroll', onScrollCrafted, { passive: true });
