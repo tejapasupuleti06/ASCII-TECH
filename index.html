@@ -14,6 +14,19 @@
 <body>
   <!-- ================= 3D PEACOCK LOADING ANIMATION ================= -->
   <div id="peacock-loader-overlay" class="peacock-loader-overlay" aria-label="Loading ASCIITECH" aria-live="polite">
+    <script>
+      (function() {
+        try {
+          if (sessionStorage.getItem('peacock_loader_seen') === '1') {
+            var el = document.getElementById('peacock-loader-overlay');
+            if (el) {
+              el.style.display = 'none';
+              el.remove();
+            }
+          }
+        } catch (e) {}
+      })();
+    </script>
     <div id="peacock-loader-canvas" class="peacock-loader-canvas"></div>
   </div>
 
@@ -776,6 +789,15 @@
   <script src="assets/loader/peacock-animation.js"></script>
   <script>
     (function () {
+      try {
+        if (sessionStorage.getItem('peacock_loader_seen') === '1') {
+          var el = document.getElementById('peacock-loader-overlay');
+          if (el) el.remove();
+          return;
+        }
+        sessionStorage.setItem('peacock_loader_seen', '1');
+      } catch (e) {}
+
       const overlay = document.getElementById('peacock-loader-overlay');
       const canvasContainer = document.getElementById('peacock-loader-canvas');
       if (!overlay || !canvasContainer || typeof PeacockLoader === 'undefined') return;

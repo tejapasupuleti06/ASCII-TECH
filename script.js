@@ -467,6 +467,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function openPdf(pdfUrl, title) {
     if (!pdfUrl) return;
 
+    try {
+      sessionStorage.setItem('peacock_loader_seen', '1');
+      sessionStorage.setItem('asciitech_last_scroll_y', Math.round(window.scrollY).toString());
+      sessionStorage.setItem('asciitech_return_target', '#brand-identity');
+    } catch (e) {}
+
     if (isMobileDevice()) {
       // Mobile: open directly in the dedicated native app / browser PDF handler
       window.location.href = pdfUrl;
@@ -991,5 +997,89 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
+  });
+
+  // --------------------------------------------------------------------------
+  // Scroll Position Persistence & Instant Restoration Across Navigation
+  // (Branddeck PDF Return & Posters Gallery Return)
+  // --------------------------------------------------------------------------
+  if ('scrollRestoration' in history) {
+    try {
+      history.scrollRestoration = 'manual';
+    } catch (e) {}
+  }
+
+  let saveScrollDebounce = null;
+  function persistCurrentScroll() {
+    try {
+      if (window.scrollY > 0) {
+        sessionStorage.setItem('asciitech_last_scroll_y', Math.round(window.scrollY).toString());
+      }
+      sessionStorage.setItem('peacock_loader_seen', '1');
+    } catch (e) {}
+  }
+
+  window.addEventListener('scroll', () => {
+    clearTimeout(saveScrollDebounce);
+    saveScrollDebounce = setTimeout(persistCurrentScroll, 100);
+  }, { passive: true });
+
+  window.addEventListener('beforeunload', persistCurrentScroll);
+  window.addEventListener('pagehide', persistCurrentScroll);
+
+  // Track any outgoing links to posters.html to remember return position
+  document.querySelectorAll('a[href*="posters.html"]').forEach((link) => {
+    link.addEventListener('click', () => {
+      try {
+        sessionStorage.setItem('peacock_loader_seen', '1');
+        sessionStorage.setItem('asciitech_last_scroll_y', Math.round(window.scrollY).toString());
+        sessionStorage.setItem('asciitech_return_target', '#showcase');
+      } catch (e) {}
+    });
+  });
+
+  function performScrollRestoration() {
+    try {
+      const returnTarget = sessionStorage.getItem('asciitech_return_target');
+      const savedYStr = sessionStorage.getItem('asciitech_last_scroll_y');
+      const savedY = savedYStr ? parseInt(savedYStr, 10) : 0;
+
+      if (returnTarget) {
+        sessionStorage.removeItem('asciitech_return_target');
+        const targetEl = document.querySelector(returnTarget);
+        if (targetEl) {
+          if (window.lenis) {
+            window.lenis.scrollTo(targetEl, { immediate: true });
+          } else {
+            targetEl.scrollIntoView({ behavior: 'instant', block: 'start' });
+          }
+          if (typeof updateParallax === 'function') {
+            updateParallax(window.scrollY);
+          }
+          return;
+        }
+      }
+
+      if (!isNaN(savedY) && savedY > 0) {
+        if (window.lenis) {
+          window.lenis.scrollTo(savedY, { immediate: true });
+        } else {
+          window.scrollTo(0, savedY);
+        }
+        if (typeof updateParallax === 'function') {
+          updateParallax(savedY);
+        }
+      }
+    } catch (e) {}
+  }
+
+  // Restore scroll position on load and on pageshow
+  performScrollRestoration();
+  window.setTimeout(performScrollRestoration, 60);
+  window.setTimeout(performScrollRestoration, 250);
+
+  window.addEventListener('pageshow', (event) => {
+    performScrollRestoration();
+    window.setTimeout(performScrollRestoration, 60);
   });
 });

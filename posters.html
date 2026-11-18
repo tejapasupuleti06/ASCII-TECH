@@ -542,6 +542,22 @@
       if (e.key === 'ArrowRight') showNext();
       if (e.key === 'ArrowLeft') showPrev();
     });
+
+    // Handle Back to Home button without reloading peacock animation & preserving scroll
+    const backBtn = document.querySelector('.posters-back-btn');
+    if (backBtn) {
+      backBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        try {
+          sessionStorage.setItem('peacock_loader_seen', '1');
+        } catch (err) {}
+        if (window.history.length > 1 && document.referrer && document.referrer.indexOf(window.location.host) !== -1) {
+          window.history.back();
+        } else {
+          window.location.href = 'index.html';
+        }
+      });
+    }
   </script>
 </body>
 </html>
