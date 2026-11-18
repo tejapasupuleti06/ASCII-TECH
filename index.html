@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ASCIITECH — Curated Design Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Lenis Smooth Inertial Scrolling -->
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+</head>
+<body>
+  <!-- ================= 3D PEACOCK LOADING ANIMATION ================= -->
+  <div id="peacock-loader-overlay" class="peacock-loader-overlay" aria-label="Loading ASCIITECH" aria-live="polite">
+    <div id="peacock-loader-canvas" class="peacock-loader-canvas"></div>
+  </div>
+
+  <!-- Header with Brand Wordmark (in 10% accent color) & Hamburger Menu Button -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#" class="wordmark" aria-label="ASCIITECH Studio">ASCIITECH</a>
+      <button 
+        type="button" 
+        class="menu-toggle" 
+        id="menu-toggle" 
+        aria-label="Toggle navigation menu" 
+        aria-expanded="false" 
+        aria-controls="menu-panel"
+      >
+        <span class="hamburger-box">
+          <span class="hamburger-line line-top"></span>
+          <span class="hamburger-line line-mid"></span>
+          <span class="hamburger-line line-bot"></span>
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Dark Scrim Backdrop (Dims hero on left when menu opens) -->
+  <div id="menu-scrim" class="menu-scrim" aria-hidden="true"></div>
+
+  <!-- Right-Side Slide-in Navigation Panel (Matches Reference Design) -->
+  <aside 
+    id="menu-panel" 
+    class="menu-panel" 
+    role="dialog" 
+    aria-modal="true" 
+    aria-label="Navigation Menu"
+    aria-hidden="true"
+  >
+    <div class="panel-inner">
+      <!-- Top Divider below header level -->
+      <div class="panel-header-spacer"></div>
+      <div class="panel-divider top-divider" role="separator" aria-hidden="true"></div>
+
+      <!-- Navigation Links (No numbers, no arrows) -->
+      <nav class="panel-nav" aria-label="Main Navigation">
+        <ul class="panel-list">
+          <li class="panel-item" style="--item-index: 0">
+            <a href="#studio" class="panel-link">Curated Studio</a>
+          </li>
+          <li class="panel-item" style="--item-index: 1">
+            <a href="#showcase" class="panel-link js-nav-link">Selected Work</a>
+          </li>
+          <li class="panel-item" style="--item-index: 2">
+            <a href="#core-disciplines" class="panel-link js-nav-link">Services &amp; Disciplines</a>
+          </li>
+          <li class="panel-item" style="--item-index: 3">
+            <a href="#brand-identity" class="panel-link js-nav-link">Brand Identity Archive</a>
+          </li>
+          <li class="panel-item" style="--item-index: 4">
+            <a href="#founders" class="panel-link">The Founders</a>
+          </li>
+          <li class="panel-item" style="--item-index: 5">
+            <a href="posters.html" class="panel-link">Poster Archive &amp; Gallery</a>
+          </li>
+          <li class="panel-item" style="--item-index: 6">
+            <a href="mailto:asciisupport@gmail.com" class="panel-link">Direct Inquiries</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Bottom Direct Contact Section -->
+      <div class="panel-contact-section">
+        <div class="panel-divider bottom-divider" role="separator" aria-hidden="true"></div>
+        <span class="contact-label">DIRECT CONTACT</span>
+        
+        <div class="contact-pills-row">
+          <a href="https://wa.me/919701173777?text=Hi%20ASCIITECH%2C%20I%20would%20like%20to%20enquire%20about%20a%20project." target="_blank" rel="noopener" class="contact-pill pill-whatsapp" aria-label="Contact via WhatsApp">
+            <svg class="pill-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+            </svg>
+            <span>WhatsApp</span>
+          </a>
+
+          <a href="tel:+919701173777" class="contact-pill pill-phone" aria-label="Call +91 97011 73777">
+            <svg class="pill-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            <span>+91 97011 73777</span>
+          </a>
+        </div>
+
+        <div class="contact-email-row">
+          <a href="mailto:asciisupport@gmail.com" class="contact-pill pill-email" aria-label="Email asciisupport@gmail.com">
+            <svg class="pill-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="16" rx="2"/>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+            <span>asciisupport@gmail.com</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Stage Container wrapping Hero and Core Disciplines -->
+  <main class="stage">
+    <!-- Pinned / Sticky Hero Section -->
+    <section class="hero-section" id="hero" aria-label="Hero Introduction">
+      <!-- Flowing Curves Animated Canvas completely replacing static hero image -->
+      <canvas id="hero-flowing-curves" class="hero-curves-canvas" aria-hidden="true"></canvas>
+
+      <!-- Layer 2: Grid and Grain Texture Overlays -->
+      <div class="hero-grid-overlay" aria-hidden="true"></div>
+      <svg class="hero-noise-overlay" aria-hidden="true">
+        <filter id="heroNoise">
+          <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/>
+        </filter>
+        <rect width="100%" height="100%" filter="url(#heroNoise)"/>
+      </svg>
+
+      <!-- Layer 3: Bottom Gradient Scrim for Legibility over Amber Highlights -->
+      <div class="hero-scrim" aria-hidden="true"></div>
+
+      <!-- Layer 4: Hero Content (Headline & Minimal Corner Services) -->
+      <div class="hero-content">
+        <!-- Minimal Corner Services Badge -->
+        <div class="hero-services" aria-label="Specialized Disciplines">
+          <div class="hero-services-box">
+            <span class="hero-services-tag">DISCIPLINES // 04</span>
+            <ul class="hero-services-list">
+              <li style="--s-index: 0">Website</li>
+              <li style="--s-index: 1">UI / UX Architecture</li>
+              <li style="--s-index: 2">Brand Identity</li>
+              <li style="--s-index: 3">E-Commerce</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="hero-headline-block">
+          <h1 class="hero-headline">
+            <div class="headline-mask line-1-mask">
+              <span class="headline-line line-1">Curated</span>
+            </div>
+            <div class="line-2-wrapper">
+              <span class="headline-mask word-design-mask">
+                <span class="headline-line line-2">Design</span>
+              </span>
+              <span class="studio-container">
+                <!-- Word 'Studio' with mobile accent dot -->
+                <span class="headline-mask word-studio-mask">
+                  <span class="headline-line line-2">Studio<span class="accent-dot">.</span></span>
+                </span>
+              </span>
+            </div>
+          </h1>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Core Disciplines Section (Flat Opaque Sheet sliding over Hero) -->
+    <section class="disciplines-section" id="core-disciplines" aria-labelledby="disciplines-heading">
+      <div class="disciplines-container">
+        <h2 id="disciplines-heading" class="disciplines-heading reveal-item">Core Disciplines</h2>
+
+        <div class="disciplines-grid">
+          <!-- Card 1: Featured Website with Centered Label -->
+          <article class="discipline-card featured-card reveal-item" style="--card-index: 1" tabindex="0">
+            <span class="featured-pill">FEATURED</span>
+            <h3 class="card-title">WEBSITE</h3>
+          </article>
+
+          <!-- Card 2: UI / UX Architecture with Centered Label -->
+          <article class="discipline-card reveal-item" style="--card-index: 2" tabindex="0">
+            <h3 class="card-title">UI / UX ARCHITECTURE</h3>
+          </article>
+
+          <!-- Card 3: Brand Identity with Centered Label -->
+          <article class="discipline-card reveal-item" style="--card-index: 3" tabindex="0">
+            <h3 class="card-title">BRAND IDENTITY</h3>
+          </article>
+
+          <!-- Card 4: E-Commerce with Centered Label -->
+          <article class="discipline-card reveal-item" style="--card-index: 4" tabindex="0">
+            <h3 class="card-title">E-COMMERCE</h3>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CRAFTED FROM IMAGINATION SECTION ================= -->
+    <section class="crafted-section" id="crafted-imagination" aria-label="Crafted from Imagination">
+      <div class="crafted-track" id="crafted-track">
+        <div class="crafted-stage" id="crafted-stage">
+          <div class="crafted-layout">
+            <div class="it i1"><img alt="Coding at a laptop" src="assets/crafted/i1.jpg" loading="lazy"></div>
+            <div class="it i2"><img alt="Create poster" src="assets/crafted/i2.jpg" loading="lazy"></div>
+            <div class="it i3"><img alt="Digital face" src="assets/crafted/i3.jpg" loading="lazy"></div>
+            <div class="it i4"><img alt="Red striped car" src="assets/crafted/i4.jpg" loading="lazy"></div>
+            <div class="it i5"><img alt="Pixelated car detail" src="assets/crafted/i5.jpg" loading="lazy"></div>
+          </div>
+          <h2 class="crafted-title">
+            <span class="ln"><span>Crafted<span class="fr"> from</span></span></span>
+            <span class="ln"><span>Imagination</span></span>
+          </h2>
+          <div class="crafted-hint" id="crafted-hint">Scroll Down</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= WORKFLOW ANIMATION VIDEO SECTION ================= -->
+    <section class="workflow-video-section" id="workflow-video" aria-label="ASCIITECH Creative Workflow Animation">
+      <div class="workflow-video-container">
+        <!-- Minimal Short Interesting Title -->
+        <div class="workflow-video-header reveal-item">
+          <span class="workflow-video-tag">PIPELINE IN MOTION</span>
+          <h2 class="workflow-video-title">FROM CODE TO CRAFT</h2>
+        </div>
+
+        <div class="workflow-video-frame">
+          <video 
+            class="workflow-video-media" 
+            src="assets/videos/ascii_workflow_v7_dark.mp4" 
+            autoplay 
+            loop 
+            muted 
+            playsinline 
+            preload="auto"
+            aria-label="ASCII Creative Design Workflow Process Animation"
+          ></video>
+        </div>
+      </div>
+    </section>
+
+    <!-- Brand Identity Marks Section (Accordion Gallery) -->
+    <section class="brand-section" id="brand-identity" aria-labelledby="brand-heading">
+      <div class="brand-container">
+        <!-- Section Heading -->
+        <h2 id="brand-heading" class="brand-heading reveal-item">Brand Identity Marks</h2>
+
+        <!-- 5-Card Expanding Accordion Gallery with Direct PDF View -->
+        <ul class="brand-gallery reveal-item" role="region" aria-label="Brand identity marks gallery">
+          <!-- Card 1: Active on load (Surprise Cakes mark) -->
+          <li 
+            class="brand-card is-active" 
+            tabindex="0" 
+            role="button" 
+            aria-label="Surprise Cakes Brand Deck"
+            aria-current="true"
+            data-index="0"
+            data-pdf="assets/pdfs/surprise-cakes-deck.pdf"
+            data-title="Surprise Cakes — Brand Deck"
+          >
+            <a href="assets/pdfs/surprise-cakes-deck.pdf" class="brand-card-link" aria-label="Open Surprise Cakes Brand Deck">
+              <img src="assets/logos/mark-01.png" alt="Surprise Cakes mark" class="logo-mark mark-seal" loading="eager" />
+            </a>
+          </li>
+
+          <!-- Card 2: The Rore Club mark -->
+          <li 
+            class="brand-card" 
+            tabindex="0" 
+            role="button" 
+            aria-label="The Rore Club Brand Deck"
+            data-index="1"
+            data-pdf="assets/pdfs/the-rore-club-deck.pdf"
+            data-title="The Rore Club — Brand Deck"
+          >
+            <a href="assets/pdfs/the-rore-club-deck.pdf" class="brand-card-link" aria-label="Open The Rore Club Brand Deck">
+              <img src="assets/logos/mark-02.png" alt="The Rore Club mark" class="logo-mark mark-r" loading="eager" />
+            </a>
+          </li>
+
+          <!-- Card 3: Suzen mark -->
+          <li 
+            class="brand-card" 
+            tabindex="0" 
+            role="button" 
+            aria-label="Suzen Brand Deck"
+            data-index="2"
+            data-pdf="assets/pdfs/suzen-deck.pdf"
+            data-title="Suzen — Brand Deck"
+          >
+            <a href="assets/pdfs/suzen-deck.pdf" class="brand-card-link" aria-label="Open Suzen Brand Deck">
+              <img src="assets/logos/mark-03.png" alt="Suzen mark" class="logo-mark mark-spiral" loading="eager" />
+            </a>
+          </li>
+
+          <!-- Card 4: LXSH Designz mark -->
+          <li 
+            class="brand-card" 
+            tabindex="0" 
+            role="button" 
+            aria-label="LXSH Designz Brand Deck"
+            data-index="3"
+            data-pdf="assets/pdfs/lxsh-designz-deck.pdf"
+            data-title="LXSH Designz — Brand Deck"
+          >
+            <a href="assets/pdfs/lxsh-designz-deck.pdf" class="brand-card-link" aria-label="Open LXSH Designz Brand Deck">
+              <img src="assets/logos/mark-04.png" alt="LXSH Designz mark" class="logo-mark mark-figure" loading="eager" />
+            </a>
+          </li>
+
+          <!-- Card 5: Maxify mark -->
+          <li 
+            class="brand-card" 
+            tabindex="0" 
+            role="button" 
+            aria-label="Maxify Brand Deck"
+            data-index="4"
+            data-pdf="assets/pdfs/maxify-deck.pdf"
+            data-title="Maxify — Brand Deck"
+          >
+            <a href="assets/pdfs/maxify-deck.pdf" class="brand-card-link" aria-label="Open Maxify Brand Deck">
+              <img src="assets/logos/mark-05.png" alt="Maxify mark" class="logo-mark mark-maxity" loading="eager" />
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+
+    <!-- Flagship Works Section: "Imagined Designed Delivered" -->
+    <section class="showcase-section" id="showcase" aria-labelledby="showcase-heading">
+      <div class="showcase-container">
+        <!-- Section Heading -->
+        <h2 id="showcase-heading" class="showcase-heading reveal-item">Imagined Designed Delivered</h2>
+
+        <!-- 2-Column Responsive Project Grid -->
+        <div class="showcase-grid reveal-item" role="region" aria-label="Flagship projects showcase">
+          <!-- Tile 1: Surprise Cakes -->
+          <article 
+            class="showcase-card" 
+            tabindex="0" 
+            role="link" 
+            aria-label="Surprise Cakes"
+            data-url="https://suprise-cakes.vercel.app/"
+            data-index="0"
+          >
+            <div class="showcase-media-frame">
+              <img 
+                src="assets/showcase/surprise-cakes-cover.jpg" 
+                alt="Surprise Cakes cover" 
+                class="showcase-media-img" 
+                loading="lazy"
+              />
+              <div class="showcase-media-overlay" aria-hidden="true"></div>
+              <div class="showcase-center-mark" aria-hidden="true">
+                <div class="showcase-brand-lockup">
+                  <img 
+                    src="assets/showcase/surprise-cakes-logo-trans.png" 
+                    alt="Surprise Cakes logo" 
+                    class="showcase-logo-img"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="showcase-card-header">
+              <h3 class="showcase-card-name">Surprise Cakes</h3>
+            </div>
+          </article>
+
+          <!-- Tile 2: The Rore Club -->
+          <article 
+            class="showcase-card" 
+            tabindex="0" 
+            role="link" 
+            aria-label="The Rore Club"
+            data-url="https://lxshdesignsdesigns.netlify.app"
+            data-index="1"
+          >
+            <div class="showcase-media-frame">
+              <img 
+                src="assets/showcase/rore-club-cover.jpg" 
+                alt="The Rore Club" 
+                class="showcase-media-img" 
+                loading="lazy"
+              />
+              <div class="showcase-media-overlay" aria-hidden="true"></div>
+              <div class="showcase-center-mark" aria-hidden="true">
+                <div class="showcase-brand-lockup">
+                  <div class="showcase-emblem-badge">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="m18 16 4-4-4-4"></path>
+                      <path d="m6 8-4 4 4 4"></path>
+                      <path d="m14.5 4-5 16"></path>
+                    </svg>
+                  </div>
+                  <h4 class="showcase-brand-title">THE RORE CLUB</h4>
+                </div>
+              </div>
+            </div>
+            <div class="showcase-card-header">
+              <h3 class="showcase-card-name">The Rore Club</h3>
+            </div>
+          </article>
+
+          <!-- Tile 3: PR Men Dot -->
+          <article 
+            class="showcase-card" 
+            tabindex="0" 
+            role="link" 
+            aria-label="PR Men Dot"
+            data-url="https://www.prmendotsaloon.in/"
+            data-index="2"
+          >
+            <div class="showcase-media-frame">
+              <img 
+                src="assets/showcase/pr-men-dot-cover.jpg" 
+                alt="PR Men Dot" 
+                class="showcase-media-img" 
+                loading="lazy"
+              />
+              <div class="showcase-media-overlay" aria-hidden="true"></div>
+              <div class="showcase-center-mark" aria-hidden="true">
+                <div class="showcase-brand-lockup">
+                  <div class="showcase-emblem-badge">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="6" cy="6" r="3"></circle>
+                      <circle cx="6" cy="18" r="3"></circle>
+                      <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
+                      <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
+                      <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
+                    </svg>
+                  </div>
+                  <h4 class="showcase-brand-title">PR MEN DOT</h4>
+                </div>
+              </div>
+            </div>
+            <div class="showcase-card-header">
+              <h3 class="showcase-card-name">PR Men Dot</h3>
+            </div>
+          </article>
+
+          <!-- Tile 4: Arogya Thatibellam -->
+          <article 
+            class="showcase-card" 
+            tabindex="0" 
+            role="link" 
+            aria-label="Arogya Thatibellam"
+            data-url="https://arogya-weld.vercel.app/"
+            data-index="3"
+          >
+            <div class="showcase-media-frame">
+              <img 
+                src="assets/showcase/arogya-thatibellam-cover.jpg" 
+                alt="Arogya Thatibellam" 
+                class="showcase-media-img" 
+                loading="lazy"
+              />
+              <div class="showcase-media-overlay" aria-hidden="true"></div>
+              <div class="showcase-center-mark" aria-hidden="true">
+                <div class="showcase-brand-lockup">
+                  <div class="showcase-emblem-badge">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M13 8c0-2.76-2.46-5-5.5-5S2 5.24 2 8h2l1-3 1 3h2l1-3 1 3h2l1-3 1 3z"></path>
+                      <path d="M13 7.14A5.82 5.82 0 0 1 16.5 6c3.04 0 5.5 2.24 5.5 5h-2l-1-3-1 3h-2l-1-3-1 3h-2"></path>
+                      <path d="M5.89 15.5c1.46-.77 2.8-2 3.61-3.5"></path>
+                      <path d="M11 13c.5 3 2.5 6 5 8"></path>
+                      <path d="M11 13c-.5 3-2.5 6-5 8"></path>
+                      <path d="M11 13v9"></path>
+                    </svg>
+                  </div>
+                  <h4 class="showcase-brand-title">AROGYA THATIBELLAM</h4>
+                </div>
+              </div>
+            </div>
+            <div class="showcase-card-header">
+              <h3 class="showcase-card-name">Arogya Thatibellam</h3>
+            </div>
+          </article>
+        </div>
+
+        <!-- View More Link at Bottom Right -->
+        <div class="showcase-footer-row reveal-item">
+          <a href="https://github.com/asciidigitals" target="_blank" rel="noopener noreferrer" class="showcase-view-more" aria-label="View more projects">
+            <span>View More Projects</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Capabilities & Services Section -->
+    <section class="services-section" id="services" aria-label="Capabilities and Services">
+      <div class="services-container">
+        <!-- Left Column: Fixed 1:1 Preview Card -->
+        <div class="services-preview-col">
+          <div class="service-preview-card" id="service-preview-card">
+            <div class="service-preview-media-wrap">
+              <img 
+                id="service-preview-img" 
+                src="assets/services/service-branding.webp" 
+                alt="Branding" 
+                class="service-preview-img" 
+                loading="eager"
+              />
+              <div class="service-preview-tint"></div>
+            </div>
+            <div class="service-preview-gradient"></div>
+            <div class="service-caption-wrapper">
+              <p id="service-caption-text" class="service-caption-text">We create impactful brand identities that connect.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Service Rows with Hairline Dividers -->
+        <div class="services-list-col" role="region" aria-label="Services list">
+          <div class="services-hairline-group">
+            <div 
+              class="service-row is-active" 
+              tabindex="0" 
+              role="button" 
+              aria-pressed="true" 
+              aria-label="Branding service"
+              data-service="branding" 
+              data-caption="We create impactful brand identities that connect." 
+              data-image="assets/services/service-branding.webp"
+            >
+              <div class="service-row-content">
+                <span class="service-row-title">Branding</span>
+              </div>
+            </div>
+
+            <div 
+              class="service-row" 
+              tabindex="0" 
+              role="button" 
+              aria-pressed="false" 
+              aria-label="Development service"
+              data-service="development" 
+              data-caption="Engineering resilient, high-speed architectures built for scale." 
+              data-image="assets/services/service-development.webp"
+            >
+              <div class="service-row-content">
+                <span class="service-row-title">Development</span>
+              </div>
+            </div>
+
+            <div 
+              class="service-row" 
+              tabindex="0" 
+              role="button" 
+              aria-pressed="false" 
+              aria-label="Websites service"
+              data-service="websites" 
+              data-caption="Crafting immersive digital flagships that convert and inspire." 
+              data-image="assets/services/service-websites.webp"
+            >
+              <div class="service-row-content">
+                <span class="service-row-title">Websites</span>
+              </div>
+            </div>
+
+            <div 
+              class="service-row" 
+              tabindex="0" 
+              role="button" 
+              aria-pressed="false" 
+              aria-label="Art Direction service"
+              data-service="art-direction" 
+              data-caption="Guiding holistic visual narratives that command cultural attention." 
+              data-image="assets/services/service-art-direction.webp"
+            >
+              <div class="service-row-content">
+                <span class="service-row-title">Art Direction</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ================= FOUNDERS SECTION ================= -->
+    <section class="founders-section" id="founders" aria-label="The People Behind The Work">
+      <div class="founders-full-wrapper reveal-item">
+        <picture>
+          <source 
+            type="image/webp" 
+            srcset="assets/founders/the-people-behind-the-work.webp 1024w, assets/founders/the-people-behind-the-work@2x.webp 2048w" 
+            sizes="(max-width: 1440px) 100vw, 1440px"
+          />
+          <img 
+            src="assets/founders/the-people-behind-the-work.jpg" 
+            srcset="assets/founders/the-people-behind-the-work.jpg 1024w, assets/founders/the-people-behind-the-work@2x.jpg 2048w" 
+            sizes="(max-width: 1440px) 100vw, 1440px"
+            width="1024"
+            height="832"
+            alt="The People Behind The Work - Teja Founder, Lokesh Co-Founder" 
+            class="founders-full-photo" 
+            loading="eager" 
+          />
+        </picture>
+      </div>
+    </section>
+
+    <!-- ================= 4D CREATIVE PROCESS SECTION ================= -->
+    <section class="process-section" id="process" aria-labelledby="process-heading">
+      <div class="process-container">
+        <!-- Section Header -->
+        <div class="process-header reveal-item">
+          <h2 id="process-heading" class="process-heading">CREATIVE PROCESS</h2>
+        </div>
+
+        <!-- 4D Process Cards Grid -->
+        <div class="process-grid reveal-item">
+          <!-- 01 DISCOVER -->
+          <article class="process-card" style="--step-idx: 0">
+            <span class="process-num">01</span>
+            <h3 class="process-step-title">DISCOVER</h3>
+            <p class="process-step-desc">Understanding the idea, audience, and problem.</p>
+          </article>
+
+          <!-- 02 DEFINE -->
+          <article class="process-card" style="--step-idx: 1">
+            <span class="process-num">02</span>
+            <h3 class="process-step-title">DEFINE</h3>
+            <p class="process-step-desc">Building the creative direction and visual strategy.</p>
+          </article>
+
+          <!-- 03 DESIGN -->
+          <article class="process-card" style="--step-idx: 2">
+            <span class="process-num">03</span>
+            <h3 class="process-step-title">DESIGN</h3>
+            <p class="process-step-desc">Exploring concepts, typography, composition, and visual systems.</p>
+          </article>
+
+          <!-- 04 DELIVER -->
+          <article class="process-card" style="--step-idx: 3">
+            <span class="process-num">04</span>
+            <h3 class="process-step-title">DELIVER</h3>
+            <p class="process-step-desc">Refining the final work and preparing it for real-world use.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FOOTER SECTION ================= -->
+    <footer class="footer-section" id="contact" role="contentinfo" aria-label="Site Footer">
+      <!-- Top CTA Banner overlapping the light/dark section boundary -->
+      <div class="footer-cta-container reveal-item">
+        <div class="footer-cta-stacked-wrap">
+          <!-- Offset background layer peeking out up and to the left -->
+          <div class="footer-cta-offset-layer" aria-hidden="true"></div>
+
+          <!-- Main CTA Card in 10% Accent Orange (#FF8C1A) -->
+          <div class="footer-cta-card">
+            <div class="footer-cta-content">
+              <h2 class="footer-cta-title">Ready for a next project?</h2>
+              <p class="footer-cta-subtitle">Let's get started!</p>
+            </div>
+            <div class="footer-cta-action">
+              <a href="mailto:asciisupport@gmail.com" class="footer-cta-btn" aria-label="Contact ASCIITECH">
+                <span>Contact us</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dark Footer Body with 5 Columns in One Row -->
+      <div class="footer-body">
+        <div class="footer-inner">
+          <div class="footer-columns-row">
+            <!-- Column 1: ASCIITECH Wordmark & Copyright -->
+            <div class="footer-col footer-col-brand reveal-item" style="--col-idx: 0">
+              <a href="#hero" class="footer-wordmark wordmark" aria-label="ASCIITECH Homepage">ASCIITECH</a>
+              <p class="footer-copyright">© 2026</p>
+            </div>
+
+            <!-- Column 2: Explore (Home, Services, Websites) -->
+            <div class="footer-col footer-col-nav reveal-item" style="--col-idx: 1">
+              <h3 class="footer-col-heading">Explore</h3>
+              <ul class="footer-links-list">
+                <li><a href="#hero" class="footer-link">Home</a></li>
+                <li><a href="#services" class="footer-link">Services</a></li>
+                <li><a href="#showcase" class="footer-link">Websites</a></li>
+              </ul>
+            </div>
+
+            <!-- Column 3: Work (Logos, Posters, Founders) -->
+            <div class="footer-col footer-col-nav reveal-item" style="--col-idx: 2">
+              <h3 class="footer-col-heading">Work</h3>
+              <ul class="footer-links-list">
+                <li><a href="#brand-identity" class="footer-link">Logos</a></li>
+                <li><a href="posters.html" class="footer-link">Posters</a></li>
+                <li><a href="#founders" class="footer-link">Founders</a></li>
+              </ul>
+            </div>
+
+            <!-- Column 4: Contact (Direct enquiries, email mailto) -->
+            <div class="footer-col footer-col-nav reveal-item" style="--col-idx: 3">
+              <h3 class="footer-col-heading">Contact</h3>
+              <ul class="footer-links-list">
+                <li><a href="mailto:asciisupport@gmail.com" class="footer-link">Direct enquiries</a></li>
+                <li><a href="mailto:asciisupport@gmail.com" class="footer-link footer-email-link">asciisupport@gmail.com</a></li>
+              </ul>
+            </div>
+
+            <!-- Column 5: Follow us (Circular Icon Buttons) -->
+            <div class="footer-col footer-col-social reveal-item" style="--col-idx: 4">
+              <h3 class="footer-col-heading">Follow us</h3>
+              <div class="footer-social-row" aria-label="Social media channels">
+                <!-- Instagram -->
+                <a href="https://www.instagram.com/asciitech_?utm_source=ig_web_button_share_sheet&xtok=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="social-circle-btn" aria-label="Follow ASCIITECH on Instagram">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                  </svg>
+                </a>
+                <!-- LinkedIn -->
+                <a href="https://www.linkedin.com/company/asciitech" target="_blank" rel="noopener noreferrer" class="social-circle-btn" aria-label="Connect with ASCIITECH on LinkedIn">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                  </svg>
+                </a>
+                <!-- X (Twitter) -->
+                <a href="https://x.com/asciitech" target="_blank" rel="noopener noreferrer" class="social-circle-btn" aria-label="Follow ASCIITECH on X">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </a>
+                <!-- Behance -->
+                <a href="https://www.behance.net/asciitech" target="_blank" rel="noopener noreferrer" class="social-circle-btn" aria-label="View ASCIITECH on Behance">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                    <path d="M22 7h-7v2h7V7zm1.726 10c-.442 1.297-2.029 3-4.976 3-3.469 0-5.5-2.678-5.5-6.002 0-3.498 2.057-5.998 5.424-5.998 3.473 0 5.252 2.502 5.252 5.998 0 .445-.059.897-.089 1.002h-7.834c.063 1.954 1.408 2.752 2.766 2.752 1.465 0 2.274-.633 2.656-1.452l2.301.7zm-7.632-4.002h5.109c-.066-1.529-1.049-2.314-2.522-2.314-1.469 0-2.457.832-2.587 2.314zM8.88 11.023C9.97 10.36 10.5 9.4 10.5 8.167c0-2.617-2.1-3.667-4.667-3.667H0v15h6.222c2.722 0 5.111-1.222 5.111-4.278 0-1.889-1.111-3.389-2.453-4.199zM3.111 6.833h2.667c1.333 0 2.222.556 2.222 1.667 0 1.111-.889 1.667-2.222 1.667H3.111V6.833zm3.111 10.334H3.111v-4.167h3.111c1.556 0 2.444.667 2.444 2.056 0 1.389-.888 2.111-2.444 2.111z"/>
+                  </svg>
+                </a>
+                <!-- WhatsApp -->
+                <a href="https://wa.me/919701173777?text=Hi%20ASCIITECH%2C%20I%20would%20like%20to%20enquire%20about%20a%20project." target="_blank" rel="noopener noreferrer" class="social-circle-btn" aria-label="Message ASCIITECH on WhatsApp">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662a11.835 11.835 0 0 0 5.715 1.455h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.488-8.412Z"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- In-Site PDF Viewer Modal (Desktop) -->
+    <div class="pdf-modal" id="pdfViewerModal" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="pdf-modal-backdrop" id="pdfModalBackdrop"></div>
+      <div class="pdf-modal-dialog">
+        <div class="pdf-modal-header">
+          <div class="pdf-modal-brand-info">
+            <span class="pdf-modal-tag">BRAND DECK</span>
+            <h3 class="pdf-modal-title" id="pdfModalTitle">Surprise Cakes — Brand Deck</h3>
+          </div>
+          <div class="pdf-modal-actions">
+            <a href="#" id="pdfModalDownload" class="pdf-btn pdf-btn-secondary" download target="_blank" rel="noopener noreferrer" aria-label="Download PDF">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Download</span>
+            </a>
+            <button type="button" class="pdf-modal-close" id="pdfModalClose" aria-label="Close PDF viewer">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+        </div>
+        <div class="pdf-modal-body">
+          <div class="pdf-modal-loader" id="pdfModalLoader" aria-hidden="true">
+            <div class="pdf-spinner"></div>
+            <span>Loading brand deck...</span>
+          </div>
+          <iframe id="pdfViewerFrame" class="pdf-frame" src="" title="Brand Deck PDF Viewer"></iframe>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 3D Peacock Loader Scripts -->
+  <script src="assets/loader/three.min.js"></script>
+  <script src="assets/loader/peacock_model.js"></script>
+  <script src="assets/loader/peacock-animation.js"></script>
+  <script>
+    (function () {
+      const overlay = document.getElementById('peacock-loader-overlay');
+      const canvasContainer = document.getElementById('peacock-loader-canvas');
+      if (!overlay || !canvasContainer || typeof PeacockLoader === 'undefined') return;
+
+      let isDismissed = false;
+      const startTime = performance.now();
+      const minDisplayTime = 2000; // Let the white peacock bloom animation display
+
+      function dismiss() {
+        if (isDismissed) return;
+        isDismissed = true;
+        overlay.classList.add('is-dismissed');
+        window.setTimeout(() => {
+          if (loader && typeof loader.destroy === 'function') {
+            loader.destroy();
+          }
+          overlay.remove();
+        }, 900);
+      }
+
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        dismiss();
+        return;
+      }
+
+      const loader = new PeacockLoader({
+        container: canvasContainer,
+        theme: 'white',
+        speed: 1.35,
+        loop: false,
+        interactive: false,
+        onComplete: () => {
+          dismiss();
+        }
+      });
+
+      window.addEventListener('load', () => {
+        const elapsed = performance.now() - startTime;
+        const remaining = Math.max(0, minDisplayTime - elapsed);
+        window.setTimeout(() => {
+          if (loader && typeof loader.finish === 'function') {
+            loader.finish();
+          }
+          window.setTimeout(dismiss, 1200);
+        }, remaining);
+      });
+
+      // Safety fallback
+      window.setTimeout(dismiss, 4500);
+    })();
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

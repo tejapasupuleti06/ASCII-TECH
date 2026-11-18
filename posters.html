@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gallery & Posters Archive — ASCIITECH</title>
+  <meta name="description" content="A curated waterfall gallery of all visual artworks, posters, and brand identities by ASCIITECH." />
+
+  <!-- Google Fonts: Poppins & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ==========================================================================
+       Waterfall Gallery Animation Page (White Background Studio)
+       ASCIITECH Design Studio
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --color-accent: #FF8C1A;
+      --font-main: 'Poppins', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: #FFFFFF;
+    }
+
+    body {
+      display: grid;
+      place-content: center;
+      background: #FFFFFF;
+      color: #000000;
+      font-family: var(--font-main);
+      min-height: 100vh;
+      width: 100%;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Fixed Minimal Floating Header */
+    .posters-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 72px;
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+    }
+
+    .posters-wordmark {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--color-accent);
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .posters-wordmark:hover {
+      opacity: 0.85;
+    }
+
+    .posters-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #000000;
+      text-decoration: none;
+      padding: 0.45rem 1.1rem;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      transition: all 0.25s ease;
+    }
+
+    .posters-back-btn:hover {
+      background: var(--color-accent);
+      color: #000000;
+      border-color: var(--color-accent);
+      transform: translateX(-2px);
+    }
+
+    /* ==========================================================================
+       Waterfall Grid Container
+       ========================================================================== */
+    .waterfall {
+      width: 80vw;
+      max-width: 1600px;
+      margin: 110px auto 8vw;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-gap: 1.25em;
+      grid-auto-flow: row dense;
+      grid-auto-rows: 10vh;
+    }
+
+    /* Staggered Height Spans (30vh, 40vh, 50vh) */
+    .waterfall .item:nth-of-type(3n+1) {
+      grid-row: auto / span 3; /* 30vh */
+    }
+
+    .waterfall .item:nth-of-type(3n+2) {
+      grid-row: auto / span 4; /* 40vh */
+    }
+
+    .waterfall .item:nth-of-type(3n+3) {
+      grid-row: auto / span 5; /* 50vh */
+    }
+
+    /* Item Card & Animation Transition on White Surface */
+    .waterfall .item {
+      position: relative;
+      overflow: hidden;
+      filter: saturate(0) opacity(0.35) blur(2.5px);
+      transition: border 0.15s, filter 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease, box-shadow 0.3s ease;
+      box-sizing: border-box;
+      border: 4px solid transparent;
+      border-radius: 6px;
+      background: #f7f7f7;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+
+    .waterfall .item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(0.7);
+      transform-origin: bottom center;
+      transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+      display: block;
+      pointer-events: none;
+    }
+
+    /* Inbound State (Scrolled into viewport) */
+    .waterfall .item.inbound {
+      filter: saturate(1) opacity(1) blur(0px);
+      border-bottom: 2px solid #000000;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    .waterfall .item.inbound img {
+      transform: scale(1.0);
+    }
+
+    /* Architectural card background for portfolio logo marks */
+    .waterfall .item.item-logo {
+      background: linear-gradient(135deg, #f2efe6 0%, #faf8f2 55%, #ede9de 100%);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .waterfall .item.item-logo img {
+      object-fit: contain;
+      padding: clamp(1.2rem, 3vw, 2.5rem);
+    }
+
+    /* Interactive hover highlight */
+    .waterfall .item:hover {
+      filter: saturate(1) opacity(1) blur(0px);
+      border-color: rgba(255, 140, 26, 0.35);
+      border-bottom-color: var(--color-accent);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    }
+
+    .waterfall .item:hover img {
+      transform: scale(1.04);
+    }
+
+    /* ==========================================================================
+       Fullscreen High-Resolution Lightbox Modal
+       ========================================================================== */
+    .lightbox-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(1rem, 3vw, 2.5rem);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .lightbox-modal.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.94);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+
+    .lightbox-dialog {
+      position: relative;
+      z-index: 10;
+      max-width: 92vw;
+      max-height: 90vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-frame {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-height: 85vh;
+      max-width: 85vw;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      background: #000000;
+    }
+
+    .lightbox-frame.is-logo-frame {
+      background: linear-gradient(135deg, #d6d4cb 0%, #ece9df 55%, #cfcdc3 100%);
+      padding: clamp(2rem, 5vw, 4rem);
+    }
+
+    .lightbox-photo {
+      max-height: 85vh;
+      max-width: 85vw;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      border-radius: 4px;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: -46px;
+      right: -8px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .lightbox-close:hover {
+      background: var(--color-accent);
+      color: #000000;
+      border-color: var(--color-accent);
+      transform: scale(1.08);
+    }
+
+    /* Lightbox Navigation Buttons (Prev / Next) */
+    .lightbox-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 20;
+    }
+
+    .lightbox-nav-btn:hover {
+      background: var(--color-accent);
+      color: #000000;
+      border-color: var(--color-accent);
+      transform: translateY(-50%) scale(1.08);
+    }
+
+    .lightbox-prev {
+      left: clamp(10px, 3vw, 40px);
+    }
+
+    .lightbox-next {
+      right: clamp(10px, 3vw, 40px);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 900px) {
+      .waterfall {
+        width: 90vw;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        grid-gap: 1em;
+        margin-top: 96px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .waterfall {
+        width: 92vw;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 0.75em;
+        grid-auto-rows: 8vh;
+        margin-top: 88px;
+      }
+
+      .waterfall .item.item-logo img {
+        padding: 1rem;
+      }
+
+      .lightbox-nav-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fixed Minimal Header -->
+  <header class="posters-header">
+    <a href="index.html" class="posters-wordmark">ASCIITECH</a>
+    <a href="index.html" class="posters-back-btn" aria-label="Back to main page">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      <span>Back to Home</span>
+    </a>
+  </header>
+
+  <!-- Waterfall Gallery Grid (Populated & Shuffled dynamically) -->
+  <main class="waterfall" id="waterfallGrid"></main>
+
+  <!-- Fullscreen Lightbox Modal -->
+  <div class="lightbox-modal" id="lightboxModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="lightbox-backdrop" id="lightboxBackdrop"></div>
+    <button class="lightbox-nav-btn lightbox-prev" id="lightboxPrev" aria-label="Previous artwork">&#10094;</button>
+    <button class="lightbox-nav-btn lightbox-next" id="lightboxNext" aria-label="Next artwork">&#10095;</button>
+    <div class="lightbox-dialog">
+      <button class="lightbox-close" id="lightboxClose" aria-label="Close viewer">&times;</button>
+      <div class="lightbox-frame" id="lightboxFrame">
+        <img id="lightboxImg" src="" alt="Full resolution view" class="lightbox-photo" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================================================
+    // Curated Poster & Artwork Collections
+    // 1st two posters removed per instruction. All 15 extra posters included.
+    // ==========================================================================
+    const topTierPosters = [
+      { src: "assets/posters/poster-38.webp", isLogo: false },
+      { src: "assets/posters/poster-45.webp", isLogo: false },
+      { src: "assets/posters/poster-46.webp", isLogo: false },
+      { src: "assets/posters/poster-40.webp", isLogo: false },
+      { src: "assets/posters/poster-35.webp", isLogo: false },
+      { src: "assets/posters/poster-42.webp", isLogo: false },
+      { src: "assets/posters/poster-36.webp", isLogo: false },
+      { src: "assets/posters/poster-43.webp", isLogo: false },
+      { src: "assets/posters/poster-37.webp", isLogo: false },
+      { src: "assets/posters/poster-39.webp", isLogo: false },
+      { src: "assets/posters/poster-34.webp", isLogo: false },
+      { src: "assets/posters/poster-17.webp", isLogo: false },
+      { src: "assets/posters/poster-19.webp", isLogo: false },
+      { src: "assets/posters/poster-30.webp", isLogo: false },
+      { src: "assets/posters/poster-31.webp", isLogo: false },
+      { src: "assets/posters/poster-08.webp", isLogo: false },
+      { src: "assets/posters/poster-09.webp", isLogo: false },
+      { src: "assets/posters/poster-28.webp", isLogo: false },
+      { src: "assets/posters/poster-29.webp", isLogo: false }
+    ];
+
+    const remainingPosters = [
+      { src: "assets/posters/poster-03.webp", isLogo: false },
+      { src: "assets/posters/poster-04.webp", isLogo: false },
+      { src: "assets/posters/poster-05.webp", isLogo: false },
+      { src: "assets/posters/poster-06.webp", isLogo: false },
+      { src: "assets/posters/poster-07.webp", isLogo: false },
+      { src: "assets/posters/poster-10.webp", isLogo: false },
+      { src: "assets/posters/poster-11.webp", isLogo: false },
+      { src: "assets/posters/poster-12.webp", isLogo: false },
+      { src: "assets/posters/poster-13.webp", isLogo: false },
+      { src: "assets/posters/poster-14.webp", isLogo: false },
+      { src: "assets/posters/poster-15.webp", isLogo: false },
+      { src: "assets/posters/poster-16.webp", isLogo: false },
+      { src: "assets/posters/poster-18.webp", isLogo: false },
+      { src: "assets/posters/poster-20.webp", isLogo: false },
+      { src: "assets/posters/poster-21.webp", isLogo: false },
+      { src: "assets/posters/poster-22.webp", isLogo: false },
+      { src: "assets/posters/poster-23.webp", isLogo: false },
+      { src: "assets/posters/poster-24.webp", isLogo: false },
+      { src: "assets/posters/poster-25.webp", isLogo: false },
+      { src: "assets/posters/poster-26.webp", isLogo: false },
+      { src: "assets/posters/poster-27.webp", isLogo: false },
+      { src: "assets/posters/poster-41.webp", isLogo: false },
+      { src: "assets/posters/poster-44.webp", isLogo: false },
+      { src: "assets/logos/logo-01.png", isLogo: true },
+      { src: "assets/logos/logo-02.png", isLogo: true },
+      { src: "assets/logos/logo-03.png", isLogo: true },
+      { src: "assets/logos/logo-04.png", isLogo: true },
+      { src: "assets/logos/logo-05.png", isLogo: true },
+      { src: "assets/logos/logo-06.png", isLogo: true },
+      { src: "assets/logos/logo-07.png", isLogo: true },
+      { src: "assets/logos/lxconfirm.png", isLogo: true },
+      { src: "assets/logos/suzen1.webp", isLogo: false }
+    ];
+
+    // ==========================================================================
+    // Tiered Dynamic Shuffle on Every Refresh
+    // Shuffles the best posters at the top, and shuffles remaining after them
+    // ==========================================================================
+    function shuffleArray(arr) {
+      const copy = arr.slice();
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    const shuffledGallery = [...shuffleArray(topTierPosters), ...shuffleArray(remainingPosters)];
+
+    const grid = document.getElementById('waterfallGrid');
+    grid.innerHTML = shuffledGallery.map((item, idx) => `
+      <div class="item ${item.isLogo ? 'item-logo' : ''}" data-index="${idx}" data-src="${item.src}" ${item.isLogo ? 'data-is-logo="true"' : ''}>
+        <img src="${item.src}" alt="Artwork" loading="${idx < 8 ? 'eager' : 'lazy'}" />
+      </div>
+    `).join('');
+
+    // ==========================================================================
+    // Intersection Observer Waterfall Trigger Engine
+    // ==========================================================================
+    const items = Array.from(grid.querySelectorAll('.item'));
+    
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        entry.target.classList.toggle('inbound', entry.intersectionRatio >= 0.85 || entry.intersectionRatio >= 1);
+      }
+    }, { 
+      threshold: [0, 0.25, 0.5, 0.85, 1.0],
+      rootMargin: "0px"
+    });
+
+    items.forEach(item => observer.observe(item));
+
+    // Reveal items that start within initial viewport
+    const checkInitialInbound = () => {
+      const vh = window.innerHeight;
+      items.forEach(item => {
+        const rect = item.getBoundingClientRect();
+        if (rect.top < vh && rect.bottom > 0) {
+          item.classList.add('inbound');
+        }
+      });
+    };
+    checkInitialInbound();
+    setTimeout(checkInitialInbound, 120);
+
+    // ==========================================================================
+    // Fullscreen Lightbox Viewer
+    // ==========================================================================
+    const modal = document.getElementById('lightboxModal');
+    const backdrop = document.getElementById('lightboxBackdrop');
+    const closeBtn = document.getElementById('lightboxClose');
+    const prevBtn = document.getElementById('lightboxPrev');
+    const nextBtn = document.getElementById('lightboxNext');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxFrame = document.getElementById('lightboxFrame');
+
+    let currentIndex = 0;
+
+    function openLightbox(index) {
+      if (index < 0 || index >= items.length) return;
+      currentIndex = index;
+      const targetItem = items[currentIndex];
+      const src = targetItem.getAttribute('data-src');
+      const isLogo = targetItem.getAttribute('data-is-logo') === 'true';
+
+      lightboxImg.src = src;
+      lightboxFrame.classList.toggle('is-logo-frame', isLogo);
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      lightboxImg.src = '';
+      document.body.style.overflow = '';
+    }
+
+    function showNext() {
+      openLightbox((currentIndex + 1) % items.length);
+    }
+
+    function showPrev() {
+      openLightbox((currentIndex - 1 + items.length) % items.length);
+    }
+
+    // Attach click events
+    items.forEach((item, idx) => {
+      item.addEventListener('click', () => openLightbox(idx));
+    });
+
+    backdrop.addEventListener('click', closeLightbox);
+    closeBtn.addEventListener('click', closeLightbox);
+    prevBtn.addEventListener('click', (e) => { e.stopPropagation(); showPrev(); });
+    nextBtn.addEventListener('click', (e) => { e.stopPropagation(); showNext(); });
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (!modal.classList.contains('is-open')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowRight') showNext();
+      if (e.key === 'ArrowLeft') showPrev();
+    });
+  </script>
+</body>
+</html>
