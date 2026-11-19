@@ -17,7 +17,9 @@
     <script>
       (function() {
         try {
-          if (sessionStorage.getItem('peacock_loader_seen') === '1') {
+          sessionStorage.removeItem('peacock_loader_seen');
+          if (sessionStorage.getItem('peacock_skip_once') === '1') {
+            sessionStorage.removeItem('peacock_skip_once');
             var el = document.getElementById('peacock-loader-overlay');
             if (el) {
               el.style.display = 'none';
@@ -136,8 +138,7 @@
       <!-- Flowing Curves Animated Canvas completely replacing static hero image -->
       <canvas id="hero-flowing-curves" class="hero-curves-canvas" aria-hidden="true"></canvas>
 
-      <!-- Layer 2: Grid and Grain Texture Overlays -->
-      <div class="hero-grid-overlay" aria-hidden="true"></div>
+      <!-- Layer 2: Texture Overlays -->
       <svg class="hero-noise-overlay" aria-hidden="true">
         <filter id="heroNoise">
           <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch"/>
@@ -155,9 +156,9 @@
           <div class="hero-services-box">
             <ul class="hero-services-list">
               <li style="--s-index: 0">Website</li>
-              <li style="--s-index: 1">UI / UX Architecture</li>
-              <li style="--s-index: 2">Brand Identity</li>
-              <li style="--s-index: 3">E-Commerce</li>
+              <li style="--s-index: 1">Branding</li>
+              <li style="--s-index: 2">Graphic Designing</li>
+              <li style="--s-index: 3">3D Rendering</li>
             </ul>
           </div>
         </div>
@@ -196,19 +197,19 @@
             <h3 class="card-title">WEBSITE</h3>
           </article>
 
-          <!-- Card 2: UI / UX Architecture with Centered Label -->
+          <!-- Card 2: Branding with Centered Label -->
           <article class="discipline-card reveal-item" style="--card-index: 2" tabindex="0">
-            <h3 class="card-title">UI / UX ARCHITECTURE</h3>
+            <h3 class="card-title">BRANDING</h3>
           </article>
 
-          <!-- Card 3: Brand Identity with Centered Label -->
+          <!-- Card 3: Graphic Designing with Centered Label -->
           <article class="discipline-card reveal-item" style="--card-index: 3" tabindex="0">
-            <h3 class="card-title">BRAND IDENTITY</h3>
+            <h3 class="card-title">GRAPHIC DESIGNING</h3>
           </article>
 
-          <!-- Card 4: E-Commerce with Centered Label -->
+          <!-- Card 4: 3D Rendering with Centered Label -->
           <article class="discipline-card reveal-item" style="--card-index: 4" tabindex="0">
-            <h3 class="card-title">E-COMMERCE</h3>
+            <h3 class="card-title">3D RENDERING</h3>
           </article>
         </div>
       </div>
@@ -229,7 +230,6 @@
             <span class="ln"><span>Crafted<span class="fr"> from</span></span></span>
             <span class="ln"><span>Imagination</span></span>
           </h2>
-          <div class="crafted-hint" id="crafted-hint">Scroll Down</div>
         </div>
       </div>
     </section>
@@ -239,7 +239,6 @@
       <div class="workflow-video-container">
         <!-- Minimal Short Interesting Title -->
         <div class="workflow-video-header reveal-item">
-          <span class="workflow-video-tag">PIPELINE IN MOTION</span>
           <h2 class="workflow-video-title">FROM CODE TO CRAFT</h2>
         </div>
 
@@ -345,12 +344,32 @@
       </div>
     </section>
 
+    <!-- ================= 3D MOTION CINEMATIC ANIMATION ================= -->
+    <section class="motion-video-section" id="motion-video" aria-label="3D Motion Craft">
+      <div class="motion-video-container">
+        <div class="motion-video-frame">
+          <video 
+            class="motion-video-media" 
+            src="assets/videos/motion_animation.mp4" 
+            autoplay 
+            loop 
+            muted 
+            playsinline 
+            webkit-playsinline
+            preload="auto"
+            aria-label="3D Motion Loop Animation"
+          >
+            <source src="assets/videos/motion_animation.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+    </section>
 
-    <!-- Flagship Works Section: "Imagined Designed Delivered" -->
+    <!-- Flagship Works Section: "Driven by Idea" -->
     <section class="showcase-section" id="showcase" aria-labelledby="showcase-heading">
       <div class="showcase-container">
         <!-- Section Heading -->
-        <h2 id="showcase-heading" class="showcase-heading reveal-item">Imagined Designed Delivered</h2>
+        <h2 id="showcase-heading" class="showcase-heading reveal-item">Driven by Idea</h2>
 
         <!-- 2-Column Responsive Project Grid -->
         <div class="showcase-grid reveal-item" role="region" aria-label="Flagship projects showcase">
@@ -372,11 +391,11 @@
               />
               <div class="showcase-media-overlay" aria-hidden="true"></div>
               <div class="showcase-center-mark" aria-hidden="true">
-                <div class="showcase-brand-lockup">
+                <div class="showcase-logo-badge">
                   <img 
-                    src="assets/showcase/surprise-cakes-logo-trans.png" 
+                    src="assets/showcase/logo-surprise-cakes.png" 
                     alt="Surprise Cakes logo" 
-                    class="showcase-logo-img"
+                    class="showcase-popup-logo"
                   />
                 </div>
               </div>
@@ -404,15 +423,12 @@
               />
               <div class="showcase-media-overlay" aria-hidden="true"></div>
               <div class="showcase-center-mark" aria-hidden="true">
-                <div class="showcase-brand-lockup">
-                  <div class="showcase-emblem-badge">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="m18 16 4-4-4-4"></path>
-                      <path d="m6 8-4 4 4 4"></path>
-                      <path d="m14.5 4-5 16"></path>
-                    </svg>
-                  </div>
-                  <h4 class="showcase-brand-title">THE RORE CLUB</h4>
+                <div class="showcase-logo-badge">
+                  <img 
+                    src="assets/showcase/logo-rore-club.png" 
+                    alt="The Rore Club logo" 
+                    class="showcase-popup-logo"
+                  />
                 </div>
               </div>
             </div>
@@ -439,17 +455,12 @@
               />
               <div class="showcase-media-overlay" aria-hidden="true"></div>
               <div class="showcase-center-mark" aria-hidden="true">
-                <div class="showcase-brand-lockup">
-                  <div class="showcase-emblem-badge">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="6" cy="6" r="3"></circle>
-                      <circle cx="6" cy="18" r="3"></circle>
-                      <line x1="20" y1="4" x2="8.12" y2="15.88"></line>
-                      <line x1="14.47" y1="14.48" x2="20" y2="20"></line>
-                      <line x1="8.12" y1="8.12" x2="12" y2="12"></line>
-                    </svg>
-                  </div>
-                  <h4 class="showcase-brand-title">PR MEN DOT</h4>
+                <div class="showcase-logo-badge">
+                  <img 
+                    src="assets/showcase/logo-pr-men-dot.png" 
+                    alt="PR Men Dot logo" 
+                    class="showcase-popup-logo"
+                  />
                 </div>
               </div>
             </div>
@@ -476,18 +487,12 @@
               />
               <div class="showcase-media-overlay" aria-hidden="true"></div>
               <div class="showcase-center-mark" aria-hidden="true">
-                <div class="showcase-brand-lockup">
-                  <div class="showcase-emblem-badge">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M13 8c0-2.76-2.46-5-5.5-5S2 5.24 2 8h2l1-3 1 3h2l1-3 1 3h2l1-3 1 3z"></path>
-                      <path d="M13 7.14A5.82 5.82 0 0 1 16.5 6c3.04 0 5.5 2.24 5.5 5h-2l-1-3-1 3h-2l-1-3-1 3h-2"></path>
-                      <path d="M5.89 15.5c1.46-.77 2.8-2 3.61-3.5"></path>
-                      <path d="M11 13c.5 3 2.5 6 5 8"></path>
-                      <path d="M11 13c-.5 3-2.5 6-5 8"></path>
-                      <path d="M11 13v9"></path>
-                    </svg>
-                  </div>
-                  <h4 class="showcase-brand-title">AROGYA THATIBELLAM</h4>
+                <div class="showcase-logo-badge">
+                  <img 
+                    src="assets/showcase/logo-arogya.png" 
+                    alt="Arogya Thatibellam logo" 
+                    class="showcase-popup-logo"
+                  />
                 </div>
               </div>
             </div>
@@ -496,17 +501,6 @@
             </div>
           </article>
         </div>
-
-        <!-- View More Link at Bottom Right -->
-        <div class="showcase-footer-row reveal-item">
-          <a href="https://github.com/asciidigitals" target="_blank" rel="noopener noreferrer" class="showcase-view-more" aria-label="View more projects">
-            <span>View More Projects</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="7" y1="17" x2="17" y2="7"></line>
-              <polyline points="7 7 17 7 17 17"></polyline>
-            </svg>
-          </a>
-        </div>
       </div>
     </section>
 
@@ -514,22 +508,48 @@
     <!-- Capabilities & Services Section -->
     <section class="services-section" id="services" aria-label="Capabilities and Services">
       <div class="services-container">
-        <!-- Left Column: Fixed 1:1 Preview Card -->
+        <!-- Left Column: Fixed 1:1 Preview Card with Animated ASCII Art -->
         <div class="services-preview-col">
           <div class="service-preview-card" id="service-preview-card">
-            <div class="service-preview-media-wrap">
-              <img 
-                id="service-preview-img" 
-                src="assets/services/service-branding.webp" 
-                alt="Branding" 
-                class="service-preview-img" 
-                loading="eager"
-              />
-              <div class="service-preview-tint"></div>
+            <div class="ascii-preview-stage" id="ascii-preview-stage">
+              <!-- Symbol 1: Websites (Circle Wave Rings + Symbol 1) -->
+              <div class="s s1 is-active" id="ascii-s1">
+                <i class="ring circle" style="animation-delay:0s"></i>
+                <i class="ring circle" style="animation-delay:2.4s"></i>
+                <i class="ring circle" style="animation-delay:4.8s"></i>
+                <i class="ring circle" style="animation-delay:7.2s"></i>
+                <img class="sym inv" src="assets/services/ascii-s1.png" alt="Website ASCII Symbol" />
+              </div>
+
+              <!-- Symbol 2: Graphic Designing (Square Wave Rings + Symbol 2) -->
+              <div class="s s2" id="ascii-s2">
+                <i class="ring square" style="animation-delay:0s"></i>
+                <i class="ring square" style="animation-delay:2.4s"></i>
+                <i class="ring square" style="animation-delay:4.8s"></i>
+                <i class="ring square" style="animation-delay:7.2s"></i>
+                <img class="sym inv" src="assets/services/ascii-s2.png" alt="Graphic Designing ASCII Symbol" />
+              </div>
+
+              <!-- Symbol 3: Branding (Diamond Wave Rings + 3D Torus Donut ASCII) -->
+              <div class="s s3" id="ascii-s3">
+                <i class="ring diamond" style="animation-delay:0s"></i>
+                <i class="ring diamond" style="animation-delay:2.4s"></i>
+                <i class="ring diamond" style="animation-delay:4.8s"></i>
+                <i class="ring diamond" style="animation-delay:7.2s"></i>
+                <pre id="donut" class="sym abs" aria-label="abstract ASCII torus"></pre>
+              </div>
+
+              <!-- Symbol 4: 3D Rendering (Squircle Wave Rings + Symbol 4) -->
+              <div class="s s4" id="ascii-s4">
+                <i class="ring squircle" style="animation-delay:0s"></i>
+                <i class="ring squircle" style="animation-delay:2.4s"></i>
+                <i class="ring squircle" style="animation-delay:4.8s"></i>
+                <i class="ring squircle" style="animation-delay:7.2s"></i>
+                <img class="sym inv" src="assets/services/ascii-s4.png" alt="3D Rendering ASCII Symbol" />
+              </div>
             </div>
-            <div class="service-preview-gradient"></div>
             <div class="service-caption-wrapper">
-              <p id="service-caption-text" class="service-caption-text">We create impactful brand identities that connect.</p>
+              <p id="service-caption-text" class="service-caption-text">Crafting immersive digital flagships that convert and inspire.</p>
             </div>
           </div>
         </div>
@@ -542,10 +562,40 @@
               tabindex="0" 
               role="button" 
               aria-pressed="true" 
+              aria-label="Website service"
+              data-service="website" 
+              data-ascii="s1"
+              data-caption="Crafting immersive digital flagships that convert and inspire."
+            >
+              <div class="service-row-content">
+                <span class="service-row-title">Website</span>
+              </div>
+            </div>
+
+            <div 
+              class="service-row" 
+              tabindex="0" 
+              role="button" 
+              aria-pressed="false" 
+              aria-label="Graphic Designing service"
+              data-service="graphic-designing" 
+              data-ascii="s2"
+              data-caption="Visual communications and editorial art that command cultural attention."
+            >
+              <div class="service-row-content">
+                <span class="service-row-title">Graphic Designing</span>
+              </div>
+            </div>
+
+            <div 
+              class="service-row" 
+              tabindex="0" 
+              role="button" 
+              aria-pressed="false" 
               aria-label="Branding service"
               data-service="branding" 
-              data-caption="We create impactful brand identities that connect." 
-              data-image="assets/services/service-branding.webp"
+              data-ascii="s3"
+              data-caption="We create impactful brand identities that connect."
             >
               <div class="service-row-content">
                 <span class="service-row-title">Branding</span>
@@ -557,43 +607,13 @@
               tabindex="0" 
               role="button" 
               aria-pressed="false" 
-              aria-label="Development service"
-              data-service="development" 
-              data-caption="Engineering resilient, high-speed architectures built for scale." 
-              data-image="assets/services/service-development.webp"
+              aria-label="3D Rendering service"
+              data-service="3d-rendering" 
+              data-ascii="s4"
+              data-caption="Photorealistic spatial visuals, product renders, and dimensional worlds."
             >
               <div class="service-row-content">
-                <span class="service-row-title">Development</span>
-              </div>
-            </div>
-
-            <div 
-              class="service-row" 
-              tabindex="0" 
-              role="button" 
-              aria-pressed="false" 
-              aria-label="Websites service"
-              data-service="websites" 
-              data-caption="Crafting immersive digital flagships that convert and inspire." 
-              data-image="assets/services/service-websites.webp"
-            >
-              <div class="service-row-content">
-                <span class="service-row-title">Websites</span>
-              </div>
-            </div>
-
-            <div 
-              class="service-row" 
-              tabindex="0" 
-              role="button" 
-              aria-pressed="false" 
-              aria-label="Art Direction service"
-              data-service="art-direction" 
-              data-caption="Guiding holistic visual narratives that command cultural attention." 
-              data-image="assets/services/service-art-direction.webp"
-            >
-              <div class="service-row-content">
-                <span class="service-row-title">Art Direction</span>
+                <span class="service-row-title">3D Rendering</span>
               </div>
             </div>
           </div>
@@ -790,12 +810,13 @@
   <script>
     (function () {
       try {
-        if (sessionStorage.getItem('peacock_loader_seen') === '1') {
+        sessionStorage.removeItem('peacock_loader_seen');
+        if (sessionStorage.getItem('peacock_skip_once') === '1') {
+          sessionStorage.removeItem('peacock_skip_once');
           var el = document.getElementById('peacock-loader-overlay');
           if (el) el.remove();
           return;
         }
-        sessionStorage.setItem('peacock_loader_seen', '1');
       } catch (e) {}
 
       const overlay = document.getElementById('peacock-loader-overlay');

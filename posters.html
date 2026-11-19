@@ -127,35 +127,35 @@
       grid-row: auto / span 5; /* 50vh */
     }
 
-    /* Item Card & Animation Transition on White Surface */
+    /* Item Card & Clean Visual Surface */
     .waterfall .item {
       position: relative;
       overflow: hidden;
-      filter: saturate(0) opacity(0.35) blur(2.5px);
-      transition: border 0.15s, filter 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease, box-shadow 0.3s ease;
+      opacity: 0.95;
+      transition: border 0.15s, opacity 0.35s ease, box-shadow 0.3s ease;
       box-sizing: border-box;
-      border: 4px solid transparent;
-      border-radius: 6px;
+      border: 3px solid transparent;
+      border-radius: 8px;
       background: #f7f7f7;
       cursor: pointer;
       user-select: none;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+      contain: content;
     }
 
     .waterfall .item img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transform: scale(0.7);
-      transform-origin: bottom center;
-      transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+      transform: scale(1.0);
+      transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
       display: block;
       pointer-events: none;
     }
 
     /* Inbound State (Scrolled into viewport) */
     .waterfall .item.inbound {
-      filter: saturate(1) opacity(1) blur(0px);
+      opacity: 1;
       border-bottom: 2px solid #000000;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     }
@@ -177,7 +177,7 @@
 
     /* Interactive hover highlight */
     .waterfall .item:hover {
-      filter: saturate(1) opacity(1) blur(0px);
+      opacity: 1;
       border-color: rgba(255, 140, 26, 0.35);
       border-bottom-color: var(--color-accent);
       box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
@@ -376,6 +376,7 @@
     // 1st two posters removed per instruction. All 15 extra posters included.
     // ==========================================================================
     const topTierPosters = [
+      { src: "assets/posters/poster-beyond-illusion.jpg", isLogo: false },
       { src: "assets/posters/poster-38.webp", isLogo: false },
       { src: "assets/posters/poster-45.webp", isLogo: false },
       { src: "assets/posters/poster-46.webp", isLogo: false },
@@ -445,12 +446,16 @@
       return copy;
     }
 
-    const shuffledGallery = [...shuffleArray(topTierPosters), ...shuffleArray(remainingPosters)];
+    const shuffledGallery = [
+      { src: "assets/posters/poster-beyond-illusion.jpg", isLogo: false },
+      ...shuffleArray(topTierPosters.filter(p => !p.src.includes("beyond-illusion"))),
+      ...shuffleArray(remainingPosters)
+    ];
 
     const grid = document.getElementById('waterfallGrid');
     grid.innerHTML = shuffledGallery.map((item, idx) => `
       <div class="item ${item.isLogo ? 'item-logo' : ''}" data-index="${idx}" data-src="${item.src}" ${item.isLogo ? 'data-is-logo="true"' : ''}>
-        <img src="${item.src}" alt="Artwork" loading="${idx < 8 ? 'eager' : 'lazy'}" />
+        <img src="${item.src}" alt="Artwork" loading="${idx < 18 ? 'eager' : 'lazy'}" decoding="async" />
       </div>
     `).join('');
 
@@ -461,27 +466,29 @@
     
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
-        entry.target.classList.toggle('inbound', entry.intersectionRatio >= 0.85 || entry.intersectionRatio >= 1);
+        if (entry.isIntersecting) {
+          entry.target.classList.add('inbound');
+        }
       }
     }, { 
-      threshold: [0, 0.25, 0.5, 0.85, 1.0],
-      rootMargin: "0px"
+      threshold: 0.05,
+      rootMargin: "300px 0px"
     });
 
     items.forEach(item => observer.observe(item));
 
-    // Reveal items that start within initial viewport
+    // Instantly reveal all items within the top two viewports
     const checkInitialInbound = () => {
       const vh = window.innerHeight;
       items.forEach(item => {
         const rect = item.getBoundingClientRect();
-        if (rect.top < vh && rect.bottom > 0) {
+        if (rect.top < vh * 2 && rect.bottom > -vh * 0.5) {
           item.classList.add('inbound');
         }
       });
     };
     checkInitialInbound();
-    setTimeout(checkInitialInbound, 120);
+    requestAnimationFrame(checkInitialInbound);
 
     // ==========================================================================
     // Fullscreen Lightbox Viewer
@@ -549,7 +556,7 @@
       backBtn.addEventListener('click', (e) => {
         e.preventDefault();
         try {
-          sessionStorage.setItem('peacock_loader_seen', '1');
+          sessionStorage.setItem('peacock_skip_once', '1');
         } catch (err) {}
         if (window.history.length > 1 && document.referrer && document.referrer.indexOf(window.location.host) !== -1) {
           window.history.back();

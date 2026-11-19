@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let cachedWindowHeight = window.innerHeight || 1;
   let scrollTicking = false;
 
+  let lastP = -1;
   function updateParallax(scrollY) {
     const isMobile = window.matchMedia('(max-width: 599px)').matches;
 
@@ -36,8 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // Mobile calculation: clamp(scrollY / cachedHeroHeight, 0, 1)
       const p = Math.min(Math.max(scrollY / (cachedHeroHeight || 1), 0), 1);
 
-      if (!prefersReducedMotion && heroSection) {
+      if (!prefersReducedMotion && heroSection && Math.abs(p - lastP) > 0.002) {
         heroSection.style.setProperty('--p', p.toFixed(4));
+        lastP = p;
       }
 
       // Add solid header background once the sheet reaches the top on mobile
@@ -50,8 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // Desktop / Tablet calculation: clamp(scrollY / innerHeight, 0, 1)
       const p = Math.min(Math.max(scrollY / cachedWindowHeight, 0), 1);
 
-      if (!prefersReducedMotion && heroSection) {
+      if (!prefersReducedMotion && heroSection && Math.abs(p - lastP) > 0.002) {
         heroSection.style.setProperty('--p', p.toFixed(4));
+        lastP = p;
       }
 
       if (p >= 0.75) {
@@ -151,29 +154,54 @@ document.addEventListener('DOMContentLoaded', () => {
       return peach[Math.max(0, Math.min(100, idx))];
     }
 
-    let W = 512;
-    let H = 256;
+    let W = 320;
+    let H = 160;
     let img = null;
     let d = null;
     let F = null;
     let isPortrait = false;
     let animId = null;
     let isVisible = true;
+    let lastFrameMs = 0;
+    let isScrollPausing = false;
+    let scrollPauseTimer = null;
+
+    window.addEventListener('scroll', () => {
+      // Pause canvas rendering during active scroll to yield 100% CPU to mobile touch gesture
+      isScrollPausing = true;
+      clearTimeout(scrollPauseTimer);
+      scrollPauseTimer = setTimeout(() => {
+        isScrollPausing = false;
+      }, 80);
+
+      // Completely pause canvas if hero is scrolled past
+      if (window.scrollY > (cachedHeroHeight || 800)) {
+        if (isVisible) {
+          isVisible = false;
+          if (animId) cancelAnimationFrame(animId);
+        }
+      } else {
+        if (!isVisible) {
+          isVisible = true;
+          animId = requestAnimationFrame(frame);
+        }
+      }
+    }, { passive: true });
 
     function resizeCanvas() {
       const rect = heroCurvesCanvas.getBoundingClientRect();
-      const screenW = rect.width || window.innerWidth || 512;
-      const screenH = rect.height || window.innerHeight || 256;
+      const screenW = rect.width || window.innerWidth || 320;
+      const screenH = rect.height || window.innerHeight || 160;
       isPortrait = window.innerWidth <= 768 || screenW < screenH;
 
       if (isPortrait) {
-        // Mobile portrait exact specification from Flowing_Curves2.html: 256 x 512 buffer
-        W = 256;
-        H = 512;
+        // High-definition mobile buffer (240x420, crisp curves on all mobile screens)
+        W = 240;
+        H = 420;
       } else {
-        // Desktop landscape exact specification from Flowing_Curves_(Landscape)1.html: 512 x 256 buffer
-        W = 512;
-        H = 256;
+        // High-definition desktop buffer (480x260, crisp silky gradient curves)
+        W = 480;
+        H = 260;
       }
 
       heroCurvesCanvas.width = W;
@@ -198,6 +226,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function frame(ms) {
       if (!isVisible) return;
+
+      // Yield 100% CPU to the browser compositor during active touch/wheel scroll
+      if (isScrollPausing && window.scrollY > 20) {
+        if (!prefersReducedMotion) {
+          animId = requestAnimationFrame(frame);
+        }
+        return;
+      }
+
+      // Throttle: 30fps on mobile (delta >= 33ms), 45fps on desktop (delta >= 22ms)
+      const minDelta = isPortrait ? 33 : 22;
+      if (ms - lastFrameMs < minDelta) {
+        if (!prefersReducedMotion) {
+          animId = requestAnimationFrame(frame);
+        }
+        return;
+      }
+      lastFrameMs = ms;
+
       const t = ms / 1000;
       for (let j = 0; j < H; j++) {
         const rowOffset = j * W;
@@ -208,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const s = [];
-      const step = 7;
+      const step = isPortrait ? 8 : 10;
       for (let j = 0; j < H; j += step) {
         const rowOffset = j * W;
         for (let i = 0; i < W; i += step) {
@@ -468,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!pdfUrl) return;
 
     try {
-      sessionStorage.setItem('peacock_loader_seen', '1');
+      sessionStorage.setItem('peacock_skip_once', '1');
       sessionStorage.setItem('asciitech_last_scroll_y', Math.round(window.scrollY).toString());
       sessionStorage.setItem('asciitech_return_target', '#brand-identity');
     } catch (e) {}
@@ -690,9 +737,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // Scroll Reveal: Workflow Video Section (IntersectionObserver)
+  // Scroll Reveal & Off-screen Pause: Workflow Video Section (IntersectionObserver)
   // --------------------------------------------------------------------------
   const workflowSection = document.getElementById('workflow-video');
+  const workflowVideo = document.querySelector('.workflow-video-media');
   if (workflowSection) {
     if (prefersReducedMotion) {
       workflowSection.classList.add('is-revealed');
@@ -702,6 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
           entries.forEach((entry) => {
             if (entry.isIntersecting) {
               workflowSection.classList.add('is-revealed');
+              if (workflowVideo) workflowVideo.play().catch(() => {});
               observer.unobserve(entry.target);
             }
           });
@@ -709,6 +758,23 @@ document.addEventListener('DOMContentLoaded', () => {
         { threshold: 0.15 }
       );
       workflowRevealObserver.observe(workflowSection);
+
+      // Dedicated play/pause observer to free up mobile GPU/CPU decoders when off-screen
+      if (workflowVideo) {
+        const videoPlayObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                workflowVideo.play().catch(() => {});
+              } else {
+                workflowVideo.pause();
+              }
+            });
+          },
+          { threshold: 0.05 }
+        );
+        videoPlayObserver.observe(workflowVideo);
+      }
     } else {
       workflowSection.classList.add('is-revealed');
     }
@@ -768,22 +834,51 @@ document.addEventListener('DOMContentLoaded', () => {
       card.classList.remove('is-active');
     });
 
-    card.addEventListener('click', (e) => {
+    card.addEventListener('click', () => {
       const url = card.getAttribute('data-url');
       if (!url) return;
-
-      const isTouch = window.matchMedia('(hover: none)').matches;
-      if (isTouch && !touchedOnce) {
-        e.preventDefault();
-        showcaseCards.forEach((c) => c.classList.remove('is-active'));
-        card.classList.add('is-active');
-        touchedOnce = true;
-        return;
-      }
-
       window.open(url, '_blank', 'noopener,noreferrer');
     });
   });
+
+  // --------------------------------------------------------------------------
+  // 3D Motion Video Section Loop & Autoplay
+  // --------------------------------------------------------------------------
+  const motionVideoSection = document.getElementById('motion-video');
+  const motionVideo = motionVideoSection ? motionVideoSection.querySelector('.motion-video-media') : null;
+  if (motionVideo) {
+    motionVideo.muted = true;
+    motionVideo.defaultMuted = true;
+    motionVideo.playsInline = true;
+    motionVideo.loop = true;
+
+    const playVideo = () => {
+      const p = motionVideo.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch(() => {});
+      }
+    };
+
+    playVideo();
+    motionVideo.addEventListener('canplay', playVideo);
+    motionVideo.addEventListener('loadedmetadata', playVideo);
+
+    if ('IntersectionObserver' in window) {
+      const motionVideoObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              playVideo();
+            } else {
+              motionVideo.pause();
+            }
+          });
+        },
+        { threshold: 0.05 }
+      );
+      motionVideoObserver.observe(motionVideoSection);
+    }
+  }
 
   // --------------------------------------------------------------------------
   // Scroll Reveal: Showcase Section (IntersectionObserver)
@@ -816,25 +911,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // Capabilities & Services Section Interaction (Hover, Tap, Keyboard Focus)
+  // Capabilities & Services Section Interaction (Animated ASCII Symbols)
   // --------------------------------------------------------------------------
   const serviceRows = document.querySelectorAll('.service-row');
-  const servicePreviewImg = document.getElementById('service-preview-img');
   const serviceCaptionText = document.getElementById('service-caption-text');
+  const asciiSymbols = document.querySelectorAll('.ascii-preview-stage .s');
 
-  if (serviceRows.length && servicePreviewImg && serviceCaptionText) {
-    // Preload all 4 images for instant switching
-    const serviceImages = [
-      'assets/services/service-branding.webp',
-      'assets/services/service-development.webp',
-      'assets/services/service-websites.webp',
-      'assets/services/service-art-direction.webp',
-    ];
-    serviceImages.forEach((src) => {
-      const preloadImg = new Image();
-      preloadImg.src = src;
-    });
-
+  if (serviceRows.length && serviceCaptionText) {
     const activateService = (row) => {
       if (row.classList.contains('is-active')) return;
 
@@ -846,32 +929,31 @@ document.addEventListener('DOMContentLoaded', () => {
       row.classList.add('is-active');
       row.setAttribute('aria-pressed', 'true');
 
-      const nextImg = row.getAttribute('data-image');
-      const nextCaption = row.getAttribute('data-caption');
+      const asciiId = row.getAttribute('data-ascii') || 's1';
+      const nextCaption = row.getAttribute('data-caption') || '';
+
+      // Switch active ASCII Symbol block
+      asciiSymbols.forEach((s) => {
+        s.classList.remove('is-active');
+      });
+      const activeSymbol = document.getElementById(`ascii-${asciiId}`);
+      if (activeSymbol) {
+        activeSymbol.classList.add('is-active');
+      }
 
       if (prefersReducedMotion) {
-        servicePreviewImg.src = nextImg;
         serviceCaptionText.textContent = nextCaption;
       } else {
-        // Crossfade image & caption with smooth scale & slide
-        servicePreviewImg.style.transition = 'opacity 0.18s cubic-bezier(0.16, 1, 0.3, 1), transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)';
         serviceCaptionText.style.transition = 'opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1), transform 0.16s cubic-bezier(0.16, 1, 0.3, 1)';
-        servicePreviewImg.style.opacity = '0';
-        servicePreviewImg.style.transform = 'scale(1.035)';
         serviceCaptionText.style.opacity = '0';
         serviceCaptionText.style.transform = 'translateY(6px)';
 
         setTimeout(() => {
-          servicePreviewImg.src = nextImg;
           serviceCaptionText.textContent = nextCaption;
-
-          servicePreviewImg.style.transition = 'opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1)';
           serviceCaptionText.style.transition = 'opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)';
-          servicePreviewImg.style.opacity = '1';
-          servicePreviewImg.style.transform = 'scale(1)';
           serviceCaptionText.style.opacity = '1';
           serviceCaptionText.style.transform = 'translateY(0)';
-        }, 180);
+        }, 160);
       }
     };
 
@@ -887,6 +969,57 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   }
+
+  // --------------------------------------------------------------------------
+  // ASCII Donut Animation for Branding Service
+  // --------------------------------------------------------------------------
+  (function initAsciiDonut() {
+    const el = document.getElementById('donut');
+    if (!el) return;
+    const W = 64, H = 28, ch = '.,-~:;=!*#$@';
+    let A = 0, B = 0, lastDonutT = 0;
+
+    function renderDonutFrame() {
+      const b = new Array(W * H).fill(' ');
+      const z = new Array(W * H).fill(0);
+      const s = Math.sin, c0 = Math.cos;
+      for (let j = 0; j < 6.28; j += 0.08) {
+        for (let i = 0; i < 6.28; i += 0.035) {
+          const c = s(i), d = c0(j), e = s(A), f = s(j), g = c0(A), h = d + 2,
+                D = 1 / (c * h * e + f * g + 5), l = c0(i), m = c0(B), n = s(B), t = c * h * g - f * e,
+                x = 0 | (W / 2 + 34 * D * (l * h * m - t * n)),
+                y = 0 | (H / 2 + 16 * D * (l * h * n + t * m)),
+                o = x + W * y,
+                N = 0 | (8 * ((f * e - c * d * g) * m - c * d * e - f * g - l * d * n));
+          if (y >= 0 && y < H && x >= 0 && x < W && D > z[o]) {
+            z[o] = D;
+            b[o] = ch[N > 0 ? N : 0];
+          }
+        }
+      }
+      let out = '';
+      for (let k = 0; k < W * H; k++) {
+        out += b[k];
+        if (k % W === W - 1) out += '\n';
+      }
+      el.textContent = out;
+      A += 0.04;
+      B += 0.025;
+    }
+
+    renderDonutFrame();
+
+    if (!prefersReducedMotion) {
+      function donutLoop(t) {
+        if (t - lastDonutT > 38) {
+          renderDonutFrame();
+          lastDonutT = t;
+        }
+        requestAnimationFrame(donutLoop);
+      }
+      requestAnimationFrame(donutLoop);
+    }
+  })();
 
   // --------------------------------------------------------------------------
   // Founders Section Scroll Reveal (IntersectionObserver)
@@ -1015,7 +1148,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (window.scrollY > 0) {
         sessionStorage.setItem('asciitech_last_scroll_y', Math.round(window.scrollY).toString());
       }
-      sessionStorage.setItem('peacock_loader_seen', '1');
     } catch (e) {}
   }
 
@@ -1031,7 +1163,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('a[href*="posters.html"]').forEach((link) => {
     link.addEventListener('click', () => {
       try {
-        sessionStorage.setItem('peacock_loader_seen', '1');
+        sessionStorage.setItem('peacock_skip_once', '1');
         sessionStorage.setItem('asciitech_last_scroll_y', Math.round(window.scrollY).toString());
         sessionStorage.setItem('asciitech_return_target', '#showcase');
       } catch (e) {}
