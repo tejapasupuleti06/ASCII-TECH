@@ -31,38 +31,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let lastP = -1;
   function updateParallax(scrollY) {
-    const isMobile = window.matchMedia('(max-width: 599px)').matches;
+    const heroH = cachedHeroHeight || window.innerHeight;
+    const p = Math.min(Math.max(scrollY / (heroH || 1), 0), 1);
 
-    if (isMobile) {
-      // Mobile calculation: clamp(scrollY / cachedHeroHeight, 0, 1)
-      const p = Math.min(Math.max(scrollY / (cachedHeroHeight || 1), 0), 1);
-
-      if (!prefersReducedMotion && heroSection && Math.abs(p - lastP) > 0.002) {
-        heroSection.style.setProperty('--p', p.toFixed(4));
-        lastP = p;
-      }
-
-      // Add solid header background once the sheet reaches the top on mobile
-      if (p >= 0.98) {
-        document.body.classList.add('header--solid');
-      } else {
-        document.body.classList.remove('header--solid');
-      }
+    // Hero stays completely static - no parallax drift
+    // When scrolling reaches Core Disciplines, the solid header background fades in
+    if (scrollY >= heroH - 64 || p >= 0.85) {
+      document.body.classList.add('header-on-light');
+      document.body.classList.add('header--solid');
+      document.body.classList.add('header--scrolled');
     } else {
-      // Desktop / Tablet calculation: clamp(scrollY / innerHeight, 0, 1)
-      const p = Math.min(Math.max(scrollY / cachedWindowHeight, 0), 1);
-
-      if (!prefersReducedMotion && heroSection && Math.abs(p - lastP) > 0.002) {
-        heroSection.style.setProperty('--p', p.toFixed(4));
-        lastP = p;
-      }
-
-      if (p >= 0.75) {
-        document.body.classList.add('header-on-light');
-      } else {
-        document.body.classList.remove('header-on-light');
-      }
+      document.body.classList.remove('header-on-light');
       document.body.classList.remove('header--solid');
+      document.body.classList.remove('header--scrolled');
     }
   }
 
@@ -448,6 +429,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --------------------------------------------------------------------------
+  // Direct Gmail Web Compose Redirect for "Contact Us" & Inquiries
+  // --------------------------------------------------------------------------
+  const GMAIL_COMPOSE_URL = 'https://mail.google.com/mail/?view=cm&fs=1&to=asciisupport@gmail.com';
+  document.addEventListener('click', (e) => {
+    const targetLink = e.target.closest('a');
+    if (!targetLink) return;
+    const href = targetLink.getAttribute('href') || '';
+    const text = (targetLink.textContent || '').trim().toLowerCase();
+    if (
+      href.includes('asciisupport@gmail.com') ||
+      href.startsWith('mailto:') ||
+      targetLink.classList.contains('footer-cta-btn') ||
+      text === 'contact us' ||
+      text === 'direct enquiries'
+    ) {
+      e.preventDefault();
+      window.open(GMAIL_COMPOSE_URL, '_blank', 'noopener,noreferrer');
+    }
+  });
+
+  // --------------------------------------------------------------------------
   // Core Disciplines: Interactive Card Hover & Selection
   // --------------------------------------------------------------------------
   const disciplinesGrid = document.querySelector('.disciplines-grid');
@@ -705,8 +707,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const maxScroll = craftedTrack.offsetHeight - window.innerHeight;
       const scrolled = -rect.top;
-      // Map progress so all 5 photos finish right as the track completes, eliminating dead scroll space
-      const p = maxScroll > 0 ? clampVal(scrolled / (maxScroll * 0.94)) : 0;
+      // Map progress so all 5 photos finish right as track completes, or active by default on compact mobile
+      const p = maxScroll > 0 ? clampVal(scrolled / (maxScroll * 0.94)) : 1;
 
       its.forEach((el, i) => {
         const c = cfg[i];
@@ -917,7 +919,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const serviceCaptionText = document.getElementById('service-caption-text');
   const asciiSymbols = document.querySelectorAll('.ascii-preview-stage .s');
 
-  if (serviceRows.length && serviceCaptionText) {
+  if (serviceRows.length) {
     const activateService = (row) => {
       if (row.classList.contains('is-active')) return;
 
@@ -930,7 +932,6 @@ document.addEventListener('DOMContentLoaded', () => {
       row.setAttribute('aria-pressed', 'true');
 
       const asciiId = row.getAttribute('data-ascii') || 's1';
-      const nextCaption = row.getAttribute('data-caption') || '';
 
       // Switch active ASCII Symbol block
       asciiSymbols.forEach((s) => {
@@ -941,19 +942,22 @@ document.addEventListener('DOMContentLoaded', () => {
         activeSymbol.classList.add('is-active');
       }
 
-      if (prefersReducedMotion) {
-        serviceCaptionText.textContent = nextCaption;
-      } else {
-        serviceCaptionText.style.transition = 'opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1), transform 0.16s cubic-bezier(0.16, 1, 0.3, 1)';
-        serviceCaptionText.style.opacity = '0';
-        serviceCaptionText.style.transform = 'translateY(6px)';
-
-        setTimeout(() => {
+      if (serviceCaptionText) {
+        const nextCaption = row.getAttribute('data-caption') || '';
+        if (prefersReducedMotion) {
           serviceCaptionText.textContent = nextCaption;
-          serviceCaptionText.style.transition = 'opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)';
-          serviceCaptionText.style.opacity = '1';
-          serviceCaptionText.style.transform = 'translateY(0)';
-        }, 160);
+        } else {
+          serviceCaptionText.style.transition = 'opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1), transform 0.16s cubic-bezier(0.16, 1, 0.3, 1)';
+          serviceCaptionText.style.opacity = '0';
+          serviceCaptionText.style.transform = 'translateY(6px)';
+
+          setTimeout(() => {
+            serviceCaptionText.textContent = nextCaption;
+            serviceCaptionText.style.transition = 'opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)';
+            serviceCaptionText.style.opacity = '1';
+            serviceCaptionText.style.transform = 'translateY(0)';
+          }, 160);
+        }
       }
     };
 
