@@ -217,8 +217,9 @@
       // Pure black background for the 3D scene
       this.scene.background = new THREE.Color(0x000000);
 
+      const isMobile = width < 600;
       this.camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-      this.camera.position.set(0, 0, 8.2);
+      this.camera.position.set(0, 0, isMobile ? 11.2 : 8.2);
 
       this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
       this.renderer.setSize(width, height);
@@ -633,7 +634,8 @@
     }
 
     animate() {
-      requestAnimationFrame(this.animate);
+      if (!this.isPlaying) return;
+      this.animFrameId = requestAnimationFrame(this.animate);
       const now = performance.now();
       const deltaTime = (now - this.lastTimestamp) / 1000.0;
       this.lastTimestamp = now;
@@ -714,6 +716,8 @@
       window.addEventListener('resize', () => {
         const width = this.container.clientWidth || window.innerWidth;
         const height = this.container.clientHeight || window.innerHeight;
+        const isMobile = width < 600;
+        this.camera.position.z = isMobile ? 11.2 : 8.2;
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
@@ -723,8 +727,16 @@
 
     destroy() {
       this.isPlaying = false;
-      if (this.renderer && this.renderer.domElement) {
-        this.renderer.domElement.remove();
+      if (this.animFrameId) {
+        cancelAnimationFrame(this.animFrameId);
+      }
+      if (this.renderer) {
+        if (typeof this.renderer.dispose === 'function') {
+          this.renderer.dispose();
+        }
+        if (this.renderer.domElement) {
+          this.renderer.domElement.remove();
+        }
       }
     }
   }

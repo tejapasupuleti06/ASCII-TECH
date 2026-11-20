@@ -75,7 +75,7 @@ html {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Lenis smooth scroll recommended base rules */
@@ -97,7 +97,8 @@ body {
   min-height: 100svh;
   background-color: var(--color-primary); /* #E5E5E5 default canvas */
   color: var(--color-secondary);           /* #646464 default text */
-  overflow-x: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   position: relative;
 }
 
@@ -758,17 +759,6 @@ body.menu-open .menu-toggle[aria-expanded="true"] .line-bot {
   border: 1px solid rgba(229, 229, 229, 0.1);
   border-radius: 10px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-}
-
-.hero-services-tag {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(229, 229, 229, 0.55);
-  margin-bottom: 0.35rem;
 }
 
 .hero-services-list {
@@ -1831,21 +1821,30 @@ body.pdf-modal-open {
     background-color: var(--color-accent);
   }
 
-  /* Full viewport pinned hero on mobile with straight curtain reveal */
+  /* Mobile pinned hero with peeking Core Disciplines sheet (matching maayasthra reference) */
   .hero-section {
-    height: 100vh;
-    height: 100svh;
-    min-height: 100vh;
-    max-height: none;
+    position: sticky;
+    top: 0;
+    height: calc(100svh - 85px);
+    height: calc(100vh - 85px);
+    min-height: 480px;
+    max-height: 87svh;
+    width: 100%;
+    z-index: 1;
+    overflow: hidden;
+    background-color: var(--color-deep);
   }
 
   .disciplines-section {
+    position: relative;
+    z-index: 2;
     margin-top: 0 !important;
-    padding-top: 36px !important;
+    padding-top: clamp(18px, 2.5vh, 24px) !important;
     border-top-left-radius: 0 !important;
     border-top-right-radius: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
+    background-color: var(--color-primary);
   }
 
   .hero-content {
@@ -1855,7 +1854,7 @@ body.pdf-modal-open {
   .hero-headline-block {
     position: relative;
     width: 100%;
-    padding: 0 20px clamp(24px, 4svh, 40px);
+    padding: 0 20px clamp(16px, 2.5svh, 24px);
     box-sizing: border-box;
   }
 
@@ -1867,35 +1866,43 @@ body.pdf-modal-open {
 
   /* Services badge on mobile: top-right corner frosted card with brand orange text */
   .hero-services {
-    display: flex;
-    position: absolute;
-    top: clamp(72px, 8.5vh, 90px);
-    bottom: auto;
-    left: auto;
-    right: 20px;
-    text-align: right;
-    pointer-events: auto;
-    z-index: 10;
-    white-space: nowrap;
+    display: flex !important;
+    position: absolute !important;
+    top: clamp(72px, 8.5vh, 90px) !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: 20px !important;
+    text-align: right !important;
+    align-items: flex-end !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
+    white-space: nowrap !important;
   }
 
   .hero-services-box {
-    padding: 8px 14px;
-    border-radius: 8px;
-    background: rgba(17, 17, 17, 0.55);
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    padding: 8px 14px !important;
+    border-radius: 8px !important;
+    background: rgba(17, 17, 17, 0.55) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border: 1px solid rgba(229, 229, 229, 0.1) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
   }
 
   .hero-services-list {
-    align-items: flex-end;
-    gap: 0.2rem;
+    align-items: flex-end !important;
+    gap: 0.2rem !important;
   }
 
   .hero-services-list li {
-    font-size: clamp(0.74rem, 2.8vw, 0.88rem);
-    font-weight: 500;
-    line-height: 1.35;
+    font-size: clamp(0.74rem, 2.8vw, 0.88rem) !important;
+    font-weight: 500 !important;
+    line-height: 1.35 !important;
     color: var(--color-accent) !important;
-    text-align: right;
+    text-align: right !important;
     opacity: 1 !important;
     transform: none !important;
   }
@@ -1959,7 +1966,7 @@ body.pdf-modal-open {
   .disciplines-section,
   .content-section {
     min-height: auto !important;
-    padding: clamp(24px, 4svh, 36px) 20px 16px !important;
+    padding: clamp(18px, 2.5svh, 24px) 20px 16px !important;
   }
 
   .disciplines-container {
@@ -1969,7 +1976,7 @@ body.pdf-modal-open {
 
   .disciplines-heading {
     font-size: clamp(1.85rem, 7.5vw, 2.5rem);
-    margin-bottom: 20px;
+    margin-bottom: 14px;
     padding: 0;
   }
 
@@ -2218,12 +2225,17 @@ body.pdf-modal-open {
     width: 100vw;
     margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
-    height: 100vh;
-    height: 100svh;
-    min-height: 100vh;
+    height: auto !important;
+    min-height: 0 !important;
+    aspect-ratio: 9 / 16;
+    background-color: #0c0b0a;
     padding: 0 !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
+    overflow: hidden;
+    display: block;
+    border: none !important;
+    box-shadow: none !important;
   }
   .motion-video-container {
     width: 100% !important;
@@ -2239,13 +2251,15 @@ body.pdf-modal-open {
     border-radius: 0 !important;
     border: none !important;
     box-shadow: none !important;
-    aspect-ratio: unset !important;
+    aspect-ratio: 9 / 16 !important;
+    background: #0c0b0a;
   }
   .motion-video-media {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
     object-position: center center !important;
+    display: block;
   }
   .motion-video-overlay {
     padding: calc(var(--header-height, 72px) + clamp(0.75rem, 2vh, 1.5rem)) clamp(1.25rem, 4vw, 2rem) clamp(2rem, 5vw, 3rem);

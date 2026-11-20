@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --------------------------------------------------------------------------
   let lenis = null;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.matchMedia('(pointer: coarse)').matches;
 
   let cachedHeroHeight = heroSection ? heroSection.offsetHeight : (window.innerHeight * 0.86);
   let cachedWindowHeight = window.innerHeight || 1;
@@ -849,6 +849,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const motionVideoSection = document.getElementById('motion-video');
   const motionVideo = motionVideoSection ? motionVideoSection.querySelector('.motion-video-media') : null;
   if (motionVideo) {
+    const isMobileViewport = window.innerWidth <= 768;
+    const mobileSrc = 'assets/videos/motion_animation_mobile.mp4';
+    const desktopSrc = 'assets/videos/motion_animation.mp4';
+    const targetSrc = isMobileViewport ? mobileSrc : desktopSrc;
+    if (motionVideo.getAttribute('src') !== targetSrc) {
+      motionVideo.src = targetSrc;
+    }
+
     motionVideo.muted = true;
     motionVideo.defaultMuted = true;
     motionVideo.playsInline = true;
@@ -1014,8 +1022,21 @@ document.addEventListener('DOMContentLoaded', () => {
     renderDonutFrame();
 
     if (!prefersReducedMotion) {
+      let isDonutVisible = false;
+      const servicesSection = document.getElementById('services');
+      if ('IntersectionObserver' in window && servicesSection) {
+        const donutObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            isDonutVisible = entry.isIntersecting;
+          });
+        }, { threshold: 0.05 });
+        donutObserver.observe(servicesSection);
+      } else {
+        isDonutVisible = true;
+      }
+
       function donutLoop(t) {
-        if (t - lastDonutT > 38) {
+        if (isDonutVisible && (t - lastDonutT > 40)) {
           renderDonutFrame();
           lastDonutT = t;
         }
@@ -1137,53 +1158,85 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --------------------------------------------------------------------------
-  // Scroll Position Persistence & Instant Restoration Across Navigation
-  // (Branddeck PDF Return & Posters Gallery Return)
+  // Intelligent Section-Based Scroll Continuity on Refresh & Navigation
+  // Ensures refreshing always continues from whichever section the user was viewing
   // --------------------------------------------------------------------------
-  if ('scrollRestoration' in history) {
-    try {
-      history.scrollRestoration = 'manual';
-    } catch (e) {}
+  const allTrackedSections = [
+    'hero',
+    'core-disciplines',
+    'crafted-imagination',
+    'workflow-video',
+    'brand-identity',
+    'motion-video',
+    'showcase',
+    'services',
+    'founders',
+    'process',
+    'contact'
+  ];
+
+  function getCurrentlyViewedSection() {
+    if (window.scrollY < 120) return 'hero';
+
+    const triggerLine = window.innerHeight * 0.4;
+    let activeId = 'hero';
+
+    for (let i = 0; i < allTrackedSections.length; i++) {
+      const id = allTrackedSections[i];
+      const el = document.getElementById(id);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= triggerLine && rect.bottom > 60) {
+          activeId = id;
+        }
+      }
+    }
+    return activeId;
   }
 
-  let saveScrollDebounce = null;
-  function persistCurrentScroll() {
+  let saveSectionTimer = null;
+  function saveCurrentSection() {
     try {
-      if (window.scrollY > 0) {
-        sessionStorage.setItem('asciitech_last_scroll_y', Math.round(window.scrollY).toString());
-      }
+      const current = getCurrentlyViewedSection();
+      sessionStorage.setItem('asciitech_active_section', current);
     } catch (e) {}
   }
 
   window.addEventListener('scroll', () => {
-    clearTimeout(saveScrollDebounce);
-    saveScrollDebounce = setTimeout(persistCurrentScroll, 100);
+    clearTimeout(saveSectionTimer);
+    saveSectionTimer = setTimeout(saveCurrentSection, 120);
   }, { passive: true });
 
-  window.addEventListener('beforeunload', persistCurrentScroll);
-  window.addEventListener('pagehide', persistCurrentScroll);
+  window.addEventListener('beforeunload', saveCurrentSection);
+  window.addEventListener('pagehide', saveCurrentSection);
 
-  // Track any outgoing links to posters.html to remember return position
+  // Track outgoing links to posters.html to remember return position
   document.querySelectorAll('a[href*="posters.html"]').forEach((link) => {
     link.addEventListener('click', () => {
       try {
         sessionStorage.setItem('peacock_skip_once', '1');
-        sessionStorage.setItem('asciitech_last_scroll_y', Math.round(window.scrollY).toString());
-        sessionStorage.setItem('asciitech_return_target', '#showcase');
+        sessionStorage.setItem('asciitech_active_section', 'showcase');
       } catch (e) {}
     });
   });
 
-  function performScrollRestoration() {
+  function restoreActiveSection() {
     try {
-      const returnTarget = sessionStorage.getItem('asciitech_return_target');
-      const savedYStr = sessionStorage.getItem('asciitech_last_scroll_y');
-      const savedY = savedYStr ? parseInt(savedYStr, 10) : 0;
+      const targetId = sessionStorage.getItem('asciitech_active_section');
+      if (!targetId || targetId === 'hero') {
+        if (window.scrollY > 0) {
+          if (window.lenis) {
+            window.lenis.scrollTo(0, { immediate: true });
+          } else {
+            window.scrollTo(0, 0);
+          }
+        }
+        return;
+      }
 
-      if (returnTarget) {
-        sessionStorage.removeItem('asciitech_return_target');
-        const targetEl = document.querySelector(returnTarget);
-        if (targetEl) {
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        const doScroll = () => {
           if (window.lenis) {
             window.lenis.scrollTo(targetEl, { immediate: true });
           } else {
@@ -1192,30 +1245,20 @@ document.addEventListener('DOMContentLoaded', () => {
           if (typeof updateParallax === 'function') {
             updateParallax(window.scrollY);
           }
-          return;
-        }
-      }
+        };
 
-      if (!isNaN(savedY) && savedY > 0) {
-        if (window.lenis) {
-          window.lenis.scrollTo(savedY, { immediate: true });
-        } else {
-          window.scrollTo(0, savedY);
-        }
-        if (typeof updateParallax === 'function') {
-          updateParallax(savedY);
-        }
+        doScroll();
+        window.requestAnimationFrame(doScroll);
+        window.setTimeout(doScroll, 80);
+        window.setTimeout(doScroll, 350);
       }
     } catch (e) {}
   }
 
-  // Restore scroll position on load and on pageshow
-  performScrollRestoration();
-  window.setTimeout(performScrollRestoration, 60);
-  window.setTimeout(performScrollRestoration, 250);
-
-  window.addEventListener('pageshow', (event) => {
-    performScrollRestoration();
-    window.setTimeout(performScrollRestoration, 60);
+  // Restore section on load, pageshow, and after layout settles
+  restoreActiveSection();
+  window.addEventListener('pageshow', restoreActiveSection);
+  window.addEventListener('load', () => {
+    window.setTimeout(restoreActiveSection, 50);
   });
 });
