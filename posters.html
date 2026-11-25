@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gallery & Posters Archive — ASCIITECH</title>
   <meta name="description" content="A curated waterfall gallery of all visual artworks, posters, and brand identities by ASCIITECH." />
+  <link rel="canonical" href="https://www.asciitech.online/posters.html" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Gallery & Posters Archive — ASCIITECH" />
+  <meta property="og:description" content="Explore the visual artworks, posters and brand identities created by ASCIITECH." />
+  <meta property="og:url" content="https://www.asciitech.online/posters.html" />
+  <meta property="og:image" content="https://www.asciitech.online/assets/logos/ascii%20new.svg" />
+  <meta property="og:image:alt" content="ASCIITECH creative design studio logo" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Gallery & Posters Archive — ASCIITECH" />
+  <meta name="twitter:description" content="Explore the visual artworks, posters and brand identities created by ASCIITECH." />
+  <meta name="twitter:image" content="https://www.asciitech.online/assets/logos/ascii%20new.svg" />
 
   <!-- Google Fonts: Poppins & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -345,6 +358,17 @@
         display: none;
       }
     }
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
   </style>
 </head>
 <body>
@@ -361,7 +385,9 @@
   </header>
 
   <!-- Waterfall Gallery Grid (Populated & Shuffled dynamically) -->
-  <main class="waterfall" id="waterfallGrid"></main>
+  <main class="waterfall" id="waterfallGrid">
+  <h1 class="sr-only">Poster, Artwork & Brand Identity Gallery — ASCIITECH</h1>
+  </main>
 
   <!-- Fullscreen Lightbox Modal -->
   <div class="lightbox-modal" id="lightboxModal" role="dialog" aria-modal="true" aria-hidden="true">
