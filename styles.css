@@ -580,7 +580,8 @@ body.menu-open .menu-toggle[aria-expanded="true"] .line-bot {
   background-color: var(--color-deep);
 }
 
-/* Layer 1: 3D Saturn Cosmic Supernova WebGL Background */
+/* Layer 1: Wire Terrain WebGL Background (Originkit) */
+.hero-terrain-canvas,
 .hero-supernova-canvas,
 .hero-curves-canvas {
   position: absolute;

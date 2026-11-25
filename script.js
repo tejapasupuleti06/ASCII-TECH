@@ -89,241 +89,436 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive: true });
 
   // --------------------------------------------------------------------------
-  // 3D Saturn Cosmic Supernova WebGL Background (matching ASCIITECH palette)
-  // Driven by Three.js InstancedMesh with 20,000 crystal shard particles
-  // Palette: Deep Charcoal (#0c0b0a), Warm Amber/Orange (#FF8C1A), Incandescent Core (#FFF8EE)
-  // Interactive mouse/touch parallax, smooth 120FPS, offscreen auto-pause
+  // Wire Terrain WebGL Background (Originkit — ASCIITECH Color Palette)
+  // Infinite synthwave procedural terrain, segmented sun & interactive steering
+  // Color Palette: Deep Charcoal (#0c0b0a), Brand Orange (#FF8C1A), Warm Ember
+  // Hardware-accelerated 120FPS, touch/pointer steering, offscreen auto-pause
   // --------------------------------------------------------------------------
-  const heroSupernovaCanvas = document.getElementById('hero-supernova-canvas');
-  if (heroSupernovaCanvas && typeof THREE !== 'undefined') {
-    let animId = null;
-    let isVisible = true;
-    let mouseX = 0, mouseY = 0;
-    let targetRotX = 0, targetRotY = 0;
+  const heroTerrainCanvas = document.getElementById('hero-wire-terrain') || document.getElementById('hero-supernova-canvas');
+  if (heroTerrainCanvas) {
+    const gl = heroTerrainCanvas.getContext('webgl', { antialias: true, alpha: false, depth: true });
+    if (gl) {
+      const DEPTH = 60;
+      const HALF_X = 64;
+      const BACK = 10;
+      const FOG_NEAR = 14;
+      const FOG_FAR = 46;
+      const FLIGHT_RATE = 4;
+      const EYE_HEIGHT = 1.7;
+      const RIDGE = 4.2;
+      const VALLEY = 3;
+      const FOV = (58 * Math.PI) / 180;
+      const SUN_ELEV = 0.02;
+      const SUN_RADIUS = 0.22;
+      const BASE_PITCH = (6.5 * Math.PI) / 180;
+      const STEER_YAW = (11 * Math.PI) / 180;
+      const STEER_LIFT = 0.8;
+      const DPR_CAP = 2;
+      const DEG = Math.PI / 180;
 
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0c0b0a, 0.007);
+      const TERRAIN_VERT = `
+      precision highp float;
+      attribute vec3 aP;
+      uniform float uCamZ;
+      uniform vec3 uCam;
+      uniform vec3 uR0;
+      uniform vec3 uR1;
+      uniform vec3 uR2;
+      uniform vec4 uProj;
+      uniform float uAmp;
+      uniform vec2 uNudge;
+      varying float vFog;
+      varying float vDist;
 
-    const getDimensions = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      return { w, h };
-    };
+      float hash(vec2 c) {
+          return fract(sin(dot(c, vec2(127.1, 311.7))) * 43758.5453);
+      }
+      float vnoise(vec2 p, float period) {
+          vec2 i = floor(p);
+          vec2 f = p - i;
+          vec2 u = f * f * (3.0 - 2.0 * f);
+          float z0 = mod(i.y, period);
+          float z1 = mod(i.y + 1.0, period);
+          float a = hash(vec2(i.x, z0));
+          float b = hash(vec2(i.x + 1.0, z0));
+          float c = hash(vec2(i.x, z1));
+          float d = hash(vec2(i.x + 1.0, z1));
+          return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+      }
+      float height(float x, float z) {
+          float n = vnoise(vec2(x, z) / 6.0, 10.0) * 0.6
+                  + vnoise(vec2(x, z) / 3.0, 20.0) * 0.27
+                  + vnoise(vec2(x, z) / 1.5, 40.0) * 0.13;
+          float ax = abs(x);
+          float side = smoothstep(3.0, 16.0, ax);
+          return uAmp * (side * (pow(n, 1.6) * 2.1 + 0.55 * ax / 64.0) + 0.1 * (n - 0.5));
+      }
 
-    let { w, h } = getDimensions();
-    const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
-    camera.position.set(0, w > 768 ? 6 : 5, w > 768 ? 76 : 88);
+      void main() {
+          float relA = mod(aP.y - uCamZ + 10.0, 60.0) - 10.0;
+          float zr = relA + aP.z;
+          float h = height(aP.x, uCamZ + zr);
+          vec3 q = vec3(aP.x - uCam.x, h - uCam.y, zr);
+          vec3 v = vec3(dot(uR0, q), dot(uR1, q), dot(uR2, q));
+          float dist = length(vec2(q.x * 0.55, zr));
+          vDist = dist;
+          vFog = 1.0 - smoothstep(14.0, 46.0, dist);
+          gl_Position = vec4(v.x * uProj.x, v.y * uProj.y, uProj.z * v.z + uProj.w, v.z);
+          gl_Position.xy += uNudge * v.z;
+      }
+      `;
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas: heroSupernovaCanvas,
-      antialias: true,
-      alpha: true,
-      powerPreference: 'high-performance'
-    });
-    renderer.setSize(w, h);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
+      const TERRAIN_FRAG = `
+      precision highp float;
+      uniform vec4 uColor;
+      uniform float uSolid;
+      varying float vFog;
+      varying float vDist;
+      void main() {
+          float fillFog = 1.0 - smoothstep(41.0, 46.0, vDist);
+          float a = uColor.a * mix(vFog, fillFog, uSolid);
+          gl_FragColor = vec4(uColor.rgb, a);
+      }
+      `;
 
-    // Supernova Group
-    const supernovaGroup = new THREE.Group();
-    supernovaGroup.position.set(w > 768 ? 10 : 0, w > 768 ? 4 : 8, 0);
-    scene.add(supernovaGroup);
+      const SKY_VERT = `
+      attribute vec3 aP;
+      void main() { gl_Position = vec4(aP.xy, 0.0, 1.0); }
+      `;
 
-    // Deep bronze ambient light
-    const ambientLight = new THREE.AmbientLight(0x281a10, 1.4);
-    scene.add(ambientLight);
+      const SKY_FRAG = `
+      precision highp float;
+      uniform vec2 uRes;
+      uniform vec3 uUp;
+      uniform vec2 uFocal;
+      uniform vec3 uSun;
+      uniform float uBandT;
+      uniform vec3 uBg;
+      uniform vec4 uAccent;
 
-    // Incandescent Core PointLight
-    const coreLight = new THREE.PointLight(0xFFB84D, 4.2, 95, 1.4);
-    coreLight.position.set(0, 0, 0);
-    supernovaGroup.add(coreLight);
+      void main() {
+          vec2 p = gl_FragCoord.xy;
+          vec2 ndc = p / uRes * 2.0 - 1.0;
+          vec3 ray = vec3(ndc.x / uFocal.x, ndc.y / uFocal.y, 1.0);
+          float worldY = dot(uUp, ray) / length(ray);
+          float pxPerRad = uRes.y * 0.5 * uFocal.y;
+          float above = clamp(worldY * pxPerRad + 0.5, 0.0, 1.0);
 
-    // Key rim light with brand accent orange (#FF8C1A)
-    const rimLight = new THREE.DirectionalLight(0xFF8C1A, 2.5);
-    rimLight.position.set(45, 50, 40);
-    scene.add(rimLight);
+          vec3 col = uBg;
+          float R = max(uSun.z, 1.0);
+          vec2 dv = p - uSun.xy;
+          float d = length(dv);
 
-    // Secondary fill backlight
-    const backLight = new THREE.DirectionalLight(0x4A2508, 1.8);
-    backLight.position.set(-45, -30, -35);
-    scene.add(backLight);
+          float halo = exp(-max(d - R, 0.0) / (R * 0.9)) * 0.16;
+          col = mix(col, uAccent.rgb, halo * uAccent.a * (0.35 + 0.65 * above));
 
-    // Stardust Core Halo
-    const starGeo = new THREE.BufferGeometry();
-    const starCount = 350;
-    const starPos = new Float32Array(starCount * 3);
-    for (let i = 0; i < starCount; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const sr = Math.pow(Math.random(), 1.8) * 16;
-      starPos[i * 3]     = sr * Math.sin(phi) * Math.cos(theta);
-      starPos[i * 3 + 1] = sr * Math.sin(phi) * Math.sin(theta);
-      starPos[i * 3 + 2] = sr * Math.cos(phi);
-    }
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-    const starMat = new THREE.PointsMaterial({
-      color: 0xFFC066,
-      size: 0.9,
-      transparent: true,
-      opacity: 0.7,
-      blending: THREE.AdditiveBlending
-    });
-    const starPoints = new THREE.Points(starGeo, starMat);
-    supernovaGroup.add(starPoints);
+          float disc = clamp(R - d + 0.5, 0.0, 1.0);
+          float yy = (uSun.y - p.y) / R;
+          float period = max(R * 0.11, 3.0);
+          float s = fract((uSun.y - p.y) / period + uBandT) * period;
+          float cut = clamp((yy + 0.3) * 0.5, 0.0, 0.8) * period;
+          float band = yy > -0.3 ? clamp(s - cut + 0.5, 0.0, 1.0) : 1.0;
+          vec3 sunTop = mix(uAccent.rgb, vec3(1.0, 0.93, 0.78), 0.32);
+          vec3 sunCol = mix(sunTop, uAccent.rgb * 0.9, clamp(yy * 0.5 + 0.5, 0.0, 1.0));
+          col = mix(col, sunCol, disc * band * uAccent.a);
 
-    // Palette Colors matching ASCIITECH theme
-    const cCore   = new THREE.Color('#FFF8EE'); // Blazing white-gold core
-    const cLight  = new THREE.Color('#FFD182'); // Luminous warm amber
-    const cOrange = new THREE.Color('#FF8C1A'); // Primary brand accent (#FF8C1A)
-    const cEmber  = new THREE.Color('#C95400'); // Deep radiant ember
-    const cDust   = new THREE.Color('#4D1E00'); // Cosmic dark bronze dust
+          gl_FragColor = vec4(col, 1.0);
+      }
+      `;
 
-    // Setup InstancedMesh
-    function buildMesh(centers) {
-      const count = centers.length / 3;
-      const geom = new THREE.TetrahedronGeometry(0.36, 0);
-      const mat = new THREE.MeshStandardMaterial({
-        roughness: 0.3,
-        metalness: 0.7,
-        flatShading: true
-      });
-
-      const instancedMesh = new THREE.InstancedMesh(geom, mat, count);
-      const dummy = new THREE.Object3D();
-      const color = new THREE.Color();
-
-      for (let i = 0; i < count; i++) {
-        const x = centers[i * 3];
-        const y = centers[i * 3 + 1];
-        const z = centers[i * 3 + 2];
-
-        dummy.position.set(x, y, z);
-        dummy.rotation.set(
-          (x * 7.91) % Math.PI,
-          (y * 11.37) % Math.PI,
-          (z * 13.82) % Math.PI
-        );
-        dummy.updateMatrix();
-        instancedMesh.setMatrixAt(i, dummy.matrix);
-
-        // Radial color gradient
-        const r = Math.sqrt(x * x + y * y + z * z);
-        const normR = Math.min(r / 62, 1.0);
-
-        if (normR < 0.22) {
-          color.copy(cCore).lerp(cLight, normR / 0.22);
-        } else if (normR < 0.55) {
-          color.copy(cLight).lerp(cOrange, (normR - 0.22) / 0.33);
-        } else if (normR < 0.82) {
-          color.copy(cOrange).lerp(cEmber, (normR - 0.55) / 0.27);
-        } else {
-          color.copy(cEmber).lerp(cDust, (normR - 0.82) / 0.18);
+      function compile(type, src) {
+        const sh = gl.createShader(type);
+        if (!sh) return null;
+        gl.shaderSource(sh, src);
+        gl.compileShader(sh);
+        if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+          console.error('WireTerrain shader:', gl.getShaderInfoLog(sh));
+          gl.deleteShader(sh);
+          return null;
         }
-
-        instancedMesh.setColorAt(i, color);
+        return sh;
       }
 
-      instancedMesh.instanceMatrix.needsUpdate = true;
-      if (instancedMesh.instanceColor) instancedMesh.instanceColor.needsUpdate = true;
-      supernovaGroup.add(instancedMesh);
-      return instancedMesh;
-    }
-
-    let instancedMesh = null;
-
-    // Fetch binary centers with fallback
-    fetch('assets/models/saturn_centers.bin')
-      .then(res => {
-        if (!res.ok) throw new Error('Fetch failed');
-        return res.arrayBuffer();
-      })
-      .then(buf => {
-        instancedMesh = buildMesh(new Float32Array(buf));
-      })
-      .catch(() => {
-        // Fallback procedural distribution if offline
-        const count = 15000;
-        const fallback = new Float32Array(count * 3);
-        for (let i = 0; i < count; i++) {
-          const theta = Math.random() * Math.PI * 2;
-          const phi = Math.acos(2 * Math.random() - 1);
-          const r = 10 + Math.pow(Math.random(), 0.7) * 45;
-          fallback[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
-          fallback[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-          fallback[i * 3 + 2] = r * Math.cos(phi);
+      function link(vs, fs) {
+        const v = compile(gl.VERTEX_SHADER, vs);
+        const f = compile(gl.FRAGMENT_SHADER, fs);
+        if (!v || !f) return null;
+        const prog = gl.createProgram();
+        if (!prog) return null;
+        gl.attachShader(prog, v);
+        gl.attachShader(prog, f);
+        gl.bindAttribLocation(prog, 0, 'aP');
+        gl.linkProgram(prog);
+        if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+          console.error('WireTerrain link:', gl.getProgramInfoLog(prog));
+          return null;
         }
-        instancedMesh = buildMesh(fallback);
-      });
-
-    // Mouse & Touch Parallax
-    window.addEventListener('mousemove', e => {
-      mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-      mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-    }, { passive: true });
-
-    window.addEventListener('touchmove', e => {
-      if (e.touches && e.touches.length > 0) {
-        mouseX = (e.touches[0].clientX / window.innerWidth - 0.5) * 2;
-        mouseY = (e.touches[0].clientY / window.innerHeight - 0.5) * 2;
+        return prog;
       }
-    }, { passive: true });
 
-    // Resize Handler
-    window.addEventListener('resize', () => {
-      const { w: newW, h: newH } = getDimensions();
-      camera.aspect = newW / newH;
-      camera.position.set(0, newW > 768 ? 6 : 5, newW > 768 ? 76 : 88);
-      camera.updateProjectionMatrix();
-      renderer.setSize(newW, newH);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      supernovaGroup.position.set(newW > 768 ? 10 : 0, newW > 768 ? 4 : 8, 0);
-    }, { passive: true });
-
-    // Animation Loop
-    let t = 0;
-    function renderFrame() {
-      if (!isVisible) return;
-
-      t += 0.0035;
-      targetRotY = mouseX * 0.35;
-      targetRotX = mouseY * 0.25;
-
-      supernovaGroup.rotation.y += (t * 0.6 + targetRotY - supernovaGroup.rotation.y) * 0.04;
-      supernovaGroup.rotation.x += (Math.sin(t * 0.45) * 0.12 + targetRotX - supernovaGroup.rotation.x) * 0.04;
-      supernovaGroup.rotation.z = Math.cos(t * 0.35) * 0.08;
-
-      starPoints.rotation.y = t * 0.9;
-      starPoints.rotation.x = t * 0.4;
-
-      renderer.render(scene, camera);
-
-      if (!prefersReducedMotion) {
-        animId = requestAnimationFrame(renderFrame);
-      }
-    }
-
-    // Performance Observer: pause render loop when hero is scrolled out of view
-    if ('IntersectionObserver' in window) {
-      const heroObserver = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            if (!isVisible) {
-              isVisible = true;
-              animId = requestAnimationFrame(renderFrame);
-            }
-          } else {
-            isVisible = false;
-            if (animId) cancelAnimationFrame(animId);
+      function buildLattice(rows) {
+        const s = DEPTH / rows;
+        const nx = Math.max(2, 2 * Math.round(HALF_X / s));
+        const tris = new Float32Array(nx * rows * 18);
+        const lines = new Float32Array(nx * rows * 12);
+        let t = 0;
+        let l = 0;
+        for (let j = 0; j < rows; j++) {
+          const z0 = j * s;
+          for (let i = 0; i < nx; i++) {
+            const x0 = -HALF_X + (i + 0.5) * s;
+            const x1 = x0 + s;
+            tris.set([x0, z0, 0, x1, z0, 0, x1, z0, s, x0, z0, 0, x1, z0, s, x0, z0, s], t);
+            t += 18;
+            lines.set([x0, z0, 0, x1, z0, 0, x0, z0, 0, x0, z0, s], l);
+            l += 12;
           }
-        });
-      }, { threshold: 0.01 });
+        }
+        return { tris, lines };
+      }
 
-      const heroEl = document.getElementById('hero') || heroSupernovaCanvas;
-      heroObserver.observe(heroEl);
+      const terrain = link(TERRAIN_VERT, TERRAIN_FRAG);
+      const sky = link(SKY_VERT, SKY_FRAG);
+
+      if (terrain && sky) {
+        const tu = {
+          camZ: gl.getUniformLocation(terrain, 'uCamZ'),
+          cam: gl.getUniformLocation(terrain, 'uCam'),
+          r0: gl.getUniformLocation(terrain, 'uR0'),
+          r1: gl.getUniformLocation(terrain, 'uR1'),
+          r2: gl.getUniformLocation(terrain, 'uR2'),
+          proj: gl.getUniformLocation(terrain, 'uProj'),
+          amp: gl.getUniformLocation(terrain, 'uAmp'),
+          nudge: gl.getUniformLocation(terrain, 'uNudge'),
+          color: gl.getUniformLocation(terrain, 'uColor'),
+          solid: gl.getUniformLocation(terrain, 'uSolid'),
+        };
+        const su = {
+          res: gl.getUniformLocation(sky, 'uRes'),
+          up: gl.getUniformLocation(sky, 'uUp'),
+          focal: gl.getUniformLocation(sky, 'uFocal'),
+          sun: gl.getUniformLocation(sky, 'uSun'),
+          bandT: gl.getUniformLocation(sky, 'uBandT'),
+          bg: gl.getUniformLocation(sky, 'uBg'),
+          accent: gl.getUniformLocation(sky, 'uAccent'),
+        };
+
+        const quad = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 0, 3, -1, 0, -1, 3, 0]), gl.STATIC_DRAW);
+        const triBuf = gl.createBuffer();
+        const lineBuf = gl.createBuffer();
+        let triCount = 0;
+        let lineCount = 0;
+        gl.enableVertexAttribArray(0);
+        gl.depthFunc(gl.LEQUAL);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+        let W = 0, H = 0, dpr = 1;
+        const resize = () => {
+          dpr = Math.min(DPR_CAP, window.devicePixelRatio || 1);
+          W = heroTerrainCanvas.parentElement ? heroTerrainCanvas.parentElement.offsetWidth : window.innerWidth;
+          H = heroTerrainCanvas.parentElement ? heroTerrainCanvas.parentElement.offsetHeight : window.innerHeight;
+          W = W || window.innerWidth || 1200;
+          H = H || window.innerHeight || 800;
+          const bw = Math.max(1, Math.round(W * dpr));
+          const bh = Math.max(1, Math.round(H * dpr));
+          if (heroTerrainCanvas.width !== bw || heroTerrainCanvas.height !== bh) {
+            heroTerrainCanvas.width = bw;
+            heroTerrainCanvas.height = bh;
+          }
+        };
+        resize();
+        window.addEventListener('resize', resize, { passive: true });
+
+        // ASCIITECH BRAND PALETTE:
+        // Deep Charcoal (#0c0b0a), Radiant Orange wireframe (#FF8C1A), Horizon segmented sun (#FF8C1A)
+        const bg = [12, 11, 10, 1]; // #0c0b0a
+        const line = [255, 140, 26, 0.95]; // #FF8C1A
+        const acc = [255, 140, 26, 1.0]; // #FF8C1A
+
+        const rows = W < 600 ? 80 : 120;
+        const speed = 85;
+        const relief = 1.0;
+        const sunSize = W < 600 ? 0.85 : 0.95;
+        const eye = 0.94 * EYE_HEIGHT;
+        const hover = 2.0;
+
+        const lat = buildLattice(rows);
+        gl.bindBuffer(gl.ARRAY_BUFFER, triBuf);
+        gl.bufferData(gl.ARRAY_BUFFER, lat.tris, gl.STATIC_DRAW);
+        triCount = lat.tris.length / 3;
+        gl.bindBuffer(gl.ARRAY_BUFFER, lineBuf);
+        gl.bufferData(gl.ARRAY_BUFFER, lat.lines, gl.STATIC_DRAW);
+        lineCount = lat.lines.length / 3;
+
+        const pointer = { nx: 0, ny: 0, active: false, presence: 0 };
+        const cam = { yaw: 0, roll: 0, lift: 0, init: false };
+        let camZ = 0;
+        let tIdle = 0;
+        let raf = 0;
+        let last = -1;
+        let isVisible = true;
+
+        const frame = (now) => {
+          if (!isVisible) return;
+
+          const dt = last < 0 ? 0 : Math.min(0.05, Math.max(0, (now - last) / 1000));
+          last = now;
+          const rate = speed / 50;
+          camZ = (camZ + dt * rate * FLIGHT_RATE) % DEPTH;
+          tIdle += dt * rate;
+
+          const pe = 1 - Math.exp(-dt * 3);
+          pointer.presence += ((pointer.active ? 1 : 0) - pointer.presence) * pe;
+          if (!pointer.active && pointer.presence < 0.002) pointer.presence = 0;
+          const k = pointer.presence * Math.min(1, hover);
+          const idleYaw = (Math.sin(tIdle * 0.21) * 3 + Math.sin(tIdle * 0.13 + 2) * 1.5) * DEG;
+          const idleRoll = Math.sin(tIdle * 0.17 + 1) * 1.8 * DEG;
+          const idleLift = Math.sin(tIdle * 0.11) * 0.12;
+          const yawT = idleYaw * (1 - k) + pointer.nx * STEER_YAW * hover * k;
+          const liftT = idleLift * (1 - k) + -pointer.ny * STEER_LIFT * hover * k;
+          const rollT = idleRoll * (1 - k) - yawT * 0.55 * k;
+          if (!cam.init) {
+            cam.yaw = yawT;
+            cam.roll = rollT;
+            cam.lift = liftT;
+            cam.init = true;
+          }
+          const ce = 1 - Math.exp(-dt * 2.5);
+          cam.yaw += (yawT - cam.yaw) * ce;
+          cam.roll += (rollT - cam.roll) * ce;
+          cam.lift += (liftT - cam.lift) * ce;
+
+          const camY = Math.max(0.35, eye * (1 + cam.lift));
+          const pitch = BASE_PITCH + (camY / EYE_HEIGHT - 1) * 2.2 * DEG;
+
+          const cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw);
+          const cp = Math.cos(pitch), sp = Math.sin(pitch);
+          const cr = Math.cos(cam.roll), sr = Math.sin(cam.roll);
+          const a0 = [cy, 0, -sy];
+          const a1 = [sp * sy, cp, sp * cy];
+          const a2 = [cp * sy, -sp, cp * cy];
+          const r0 = [cr * a0[0] - sr * a1[0], cr * a0[1] - sr * a1[1], cr * a0[2] - sr * a1[2]];
+          const r1 = [sr * a0[0] + cr * a1[0], sr * a0[1] + cr * a1[1], sr * a0[2] + cr * a1[2]];
+          const r2 = a2;
+
+          const aspect = W / Math.max(1, H);
+          const fy = 1 / Math.tan(FOV / 2);
+          const fx = fy / aspect;
+          const near = 0.05;
+          const far = 200;
+          const A = (far + near) / (far - near);
+          const B = (-2 * far * near) / (far - near);
+
+          const sd = [0, SUN_ELEV, 1];
+          const sv = [
+            r0[0] * sd[0] + r0[1] * sd[1] + r0[2] * sd[2],
+            r1[0] * sd[0] + r1[1] * sd[1] + r1[2] * sd[2],
+            r2[0] * sd[0] + r2[1] * sd[1] + r2[2] * sd[2],
+          ];
+          const svz = Math.max(1e-3, sv[2]);
+          const bw = heroTerrainCanvas.width;
+          const bh = heroTerrainCanvas.height;
+          const sunX = ((sv[0] / svz) * fx * 0.5 + 0.5) * bw;
+          const sunY = ((sv[1] / svz) * fy * 0.5 + 0.5) * bh;
+
+          gl.viewport(0, 0, bw, bh);
+          gl.clearColor(bg[0] / 255, bg[1] / 255, bg[2] / 255, 1);
+          gl.depthMask(true);
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+          // sky + sun
+          gl.disable(gl.DEPTH_TEST);
+          gl.disable(gl.BLEND);
+          gl.useProgram(sky);
+          gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+          gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+          gl.uniform2f(su.res, bw, bh);
+          gl.uniform3f(su.up, r0[1], r1[1], r2[1]);
+          gl.uniform2f(su.focal, fx, fy);
+          gl.uniform3f(su.sun, sunX, sunY, SUN_RADIUS * sunSize * bh);
+          gl.uniform1f(su.bandT, tIdle * 0.12);
+          gl.uniform3f(su.bg, bg[0] / 255, bg[1] / 255, bg[2] / 255);
+          gl.uniform4f(su.accent, acc[0] / 255, acc[1] / 255, acc[2] / 255, sunSize > 0 ? acc[3] : 0);
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+          // terrain
+          gl.useProgram(terrain);
+          gl.uniform1f(tu.camZ, camZ);
+          gl.uniform3f(tu.cam, 0, camY, 0);
+          gl.uniform3f(tu.r0, r0[0], r0[1], r0[2]);
+          gl.uniform3f(tu.r1, r1[0], r1[1], r1[2]);
+          gl.uniform3f(tu.r2, r2[0], r2[1], r2[2]);
+          gl.uniform4f(tu.proj, fx, fy, A, B);
+          gl.uniform1f(tu.amp, RIDGE * relief);
+          gl.enable(gl.DEPTH_TEST);
+          gl.enable(gl.BLEND);
+
+          // hidden-line fill: Background
+          gl.depthMask(true);
+          gl.enable(gl.POLYGON_OFFSET_FILL);
+          gl.polygonOffset(1, 1);
+          gl.uniform2f(tu.nudge, 0, 0);
+          gl.uniform1f(tu.solid, 1);
+          gl.uniform4f(tu.color, bg[0] / 255, bg[1] / 255, bg[2] / 255, 1);
+          gl.bindBuffer(gl.ARRAY_BUFFER, triBuf);
+          gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+          gl.drawArrays(gl.TRIANGLES, 0, triCount);
+          gl.disable(gl.POLYGON_OFFSET_FILL);
+
+          // lines
+          gl.depthMask(false);
+          gl.uniform1f(tu.solid, 0);
+          gl.uniform4f(tu.color, line[0] / 255, line[1] / 255, line[2] / 255, line[3]);
+          gl.bindBuffer(gl.ARRAY_BUFFER, lineBuf);
+          gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+          gl.drawArrays(gl.LINES, 0, lineCount);
+          if (dpr > 1.25) {
+            gl.uniform2f(tu.nudge, 2 / bw, 2 / bh);
+            gl.drawArrays(gl.LINES, 0, lineCount);
+          }
+          gl.depthMask(true);
+
+          if (!prefersReducedMotion) {
+            raf = requestAnimationFrame(frame);
+          }
+        };
+
+        raf = requestAnimationFrame(frame);
+
+        // Pointer steer interaction
+        window.addEventListener('pointermove', (e) => {
+          pointer.nx = Math.max(-1, Math.min(1, (e.clientX / window.innerWidth) * 2 - 1));
+          pointer.ny = Math.max(-1, Math.min(1, (e.clientY / window.innerHeight) * 2 - 1));
+          pointer.active = true;
+        }, { passive: true });
+
+        window.addEventListener('pointerleave', () => {
+          pointer.active = false;
+        }, { passive: true });
+
+        // Performance Observer: pause loop when hero is off-screen
+        if ('IntersectionObserver' in window) {
+          const heroObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                if (!isVisible) {
+                  isVisible = true;
+                  raf = requestAnimationFrame(frame);
+                }
+              } else {
+                isVisible = false;
+                if (raf) cancelAnimationFrame(raf);
+              }
+            });
+          }, { threshold: 0.01 });
+
+          const heroEl = document.getElementById('hero') || heroTerrainCanvas;
+          heroObserver.observe(heroEl);
+        }
+      }
     }
-
-    animId = requestAnimationFrame(renderFrame);
   }
 
   // --------------------------------------------------------------------------
