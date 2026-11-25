@@ -89,213 +89,228 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive: true });
 
   // --------------------------------------------------------------------------
-  // Flowing Curves Canvas Background for Hero Section
-  // Smooth-blended dark charcoal & glowing peach wave field
-  // Fully responsive & optimized for both desktop and mobile viewports
+  // 3D Saturn Cosmic Supernova WebGL Background (matching ASCIITECH palette)
+  // Driven by Three.js InstancedMesh with 20,000 crystal shard particles
+  // Palette: Deep Charcoal (#0c0b0a), Warm Amber/Orange (#FF8C1A), Incandescent Core (#FFF8EE)
+  // Interactive mouse/touch parallax, smooth 120FPS, offscreen auto-pause
   // --------------------------------------------------------------------------
-  const heroCurvesCanvas = document.getElementById('hero-flowing-curves');
-  if (heroCurvesCanvas) {
-    const ctx = heroCurvesCanvas.getContext('2d');
-
-    function hsl(h, s, l) {
-      s /= 100;
-      l /= 100;
-      const k = n => (n + h / 30) % 12;
-      const a = s * Math.min(l, 1 - l);
-      const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-      return [f(0) * 255, f(8) * 255, f(4) * 255];
-    }
-
-    const peach = [];
-    const gray = [];
-    for (let L = 0; L <= 100; L++) {
-      peach.push(hsl(21, 100, L));
-      const g = L * 2.55;
-      gray.push([g, g, g]);
-    }
-
-    const w = 0.16;
-    const cl = x => x < 0 ? 0 : x > 1 ? 1 : x;
-    const ss = (a, b, x) => {
-      x = cl((x - a) / (b - a));
-      return x * x * (3 - 2 * x);
-    };
-
-    function gc(v, lo, p) {
-      const u = cl((v - lo) / (p - lo));
-      const ln = Math.abs((u * 14) % 1 - 0.5) < 0.06 ? 3 : 0;
-      const idx = Math.round(46 - Math.min(3, Math.floor(u * 4)) * 4.5 - ln);
-      return gray[Math.max(0, Math.min(100, idx))];
-    }
-
-    function pc(v, p, hi) {
-      const u = cl((v - p) / (hi - p));
-      const ln = Math.abs((u * 10) % 1 - 0.5) < 0.07 ? 4 : 0;
-      const idx = Math.round(86 - Math.min(4, Math.floor(u * 5)) * 5.5 - ln);
-      return peach[Math.max(0, Math.min(100, idx))];
-    }
-
-    let W = 320;
-    let H = 160;
-    let img = null;
-    let d = null;
-    let F = null;
-    let isPortrait = false;
+  const heroSupernovaCanvas = document.getElementById('hero-supernova-canvas');
+  if (heroSupernovaCanvas && typeof THREE !== 'undefined') {
     let animId = null;
     let isVisible = true;
-    let lastFrameMs = 0;
-    let isScrollPausing = false;
-    let scrollPauseTimer = null;
+    let mouseX = 0, mouseY = 0;
+    let targetRotX = 0, targetRotY = 0;
 
-    window.addEventListener('scroll', () => {
-      // Pause canvas rendering during active scroll to yield 100% CPU to mobile touch gesture
-      isScrollPausing = true;
-      clearTimeout(scrollPauseTimer);
-      scrollPauseTimer = setTimeout(() => {
-        isScrollPausing = false;
-      }, 80);
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x0c0b0a, 0.007);
 
-      // Completely pause canvas if hero is scrolled past
-      if (window.scrollY > (cachedHeroHeight || 800)) {
-        if (isVisible) {
-          isVisible = false;
-          if (animId) cancelAnimationFrame(animId);
+    const getDimensions = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      return { w, h };
+    };
+
+    let { w, h } = getDimensions();
+    const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 1000);
+    camera.position.set(0, w > 768 ? 6 : 5, w > 768 ? 76 : 88);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas: heroSupernovaCanvas,
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.35;
+
+    // Supernova Group
+    const supernovaGroup = new THREE.Group();
+    supernovaGroup.position.set(w > 768 ? 10 : 0, w > 768 ? 4 : 8, 0);
+    scene.add(supernovaGroup);
+
+    // Deep bronze ambient light
+    const ambientLight = new THREE.AmbientLight(0x281a10, 1.4);
+    scene.add(ambientLight);
+
+    // Incandescent Core PointLight
+    const coreLight = new THREE.PointLight(0xFFB84D, 4.2, 95, 1.4);
+    coreLight.position.set(0, 0, 0);
+    supernovaGroup.add(coreLight);
+
+    // Key rim light with brand accent orange (#FF8C1A)
+    const rimLight = new THREE.DirectionalLight(0xFF8C1A, 2.5);
+    rimLight.position.set(45, 50, 40);
+    scene.add(rimLight);
+
+    // Secondary fill backlight
+    const backLight = new THREE.DirectionalLight(0x4A2508, 1.8);
+    backLight.position.set(-45, -30, -35);
+    scene.add(backLight);
+
+    // Stardust Core Halo
+    const starGeo = new THREE.BufferGeometry();
+    const starCount = 350;
+    const starPos = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const sr = Math.pow(Math.random(), 1.8) * 16;
+      starPos[i * 3]     = sr * Math.sin(phi) * Math.cos(theta);
+      starPos[i * 3 + 1] = sr * Math.sin(phi) * Math.sin(theta);
+      starPos[i * 3 + 2] = sr * Math.cos(phi);
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    const starMat = new THREE.PointsMaterial({
+      color: 0xFFC066,
+      size: 0.9,
+      transparent: true,
+      opacity: 0.7,
+      blending: THREE.AdditiveBlending
+    });
+    const starPoints = new THREE.Points(starGeo, starMat);
+    supernovaGroup.add(starPoints);
+
+    // Palette Colors matching ASCIITECH theme
+    const cCore   = new THREE.Color('#FFF8EE'); // Blazing white-gold core
+    const cLight  = new THREE.Color('#FFD182'); // Luminous warm amber
+    const cOrange = new THREE.Color('#FF8C1A'); // Primary brand accent (#FF8C1A)
+    const cEmber  = new THREE.Color('#C95400'); // Deep radiant ember
+    const cDust   = new THREE.Color('#4D1E00'); // Cosmic dark bronze dust
+
+    // Setup InstancedMesh
+    function buildMesh(centers) {
+      const count = centers.length / 3;
+      const geom = new THREE.TetrahedronGeometry(0.36, 0);
+      const mat = new THREE.MeshStandardMaterial({
+        roughness: 0.3,
+        metalness: 0.7,
+        flatShading: true
+      });
+
+      const instancedMesh = new THREE.InstancedMesh(geom, mat, count);
+      const dummy = new THREE.Object3D();
+      const color = new THREE.Color();
+
+      for (let i = 0; i < count; i++) {
+        const x = centers[i * 3];
+        const y = centers[i * 3 + 1];
+        const z = centers[i * 3 + 2];
+
+        dummy.position.set(x, y, z);
+        dummy.rotation.set(
+          (x * 7.91) % Math.PI,
+          (y * 11.37) % Math.PI,
+          (z * 13.82) % Math.PI
+        );
+        dummy.updateMatrix();
+        instancedMesh.setMatrixAt(i, dummy.matrix);
+
+        // Radial color gradient
+        const r = Math.sqrt(x * x + y * y + z * z);
+        const normR = Math.min(r / 62, 1.0);
+
+        if (normR < 0.22) {
+          color.copy(cCore).lerp(cLight, normR / 0.22);
+        } else if (normR < 0.55) {
+          color.copy(cLight).lerp(cOrange, (normR - 0.22) / 0.33);
+        } else if (normR < 0.82) {
+          color.copy(cOrange).lerp(cEmber, (normR - 0.55) / 0.27);
+        } else {
+          color.copy(cEmber).lerp(cDust, (normR - 0.82) / 0.18);
         }
-      } else {
-        if (!isVisible) {
-          isVisible = true;
-          animId = requestAnimationFrame(frame);
+
+        instancedMesh.setColorAt(i, color);
+      }
+
+      instancedMesh.instanceMatrix.needsUpdate = true;
+      if (instancedMesh.instanceColor) instancedMesh.instanceColor.needsUpdate = true;
+      supernovaGroup.add(instancedMesh);
+      return instancedMesh;
+    }
+
+    let instancedMesh = null;
+
+    // Fetch binary centers with fallback
+    fetch('assets/models/saturn_centers.bin')
+      .then(res => {
+        if (!res.ok) throw new Error('Fetch failed');
+        return res.arrayBuffer();
+      })
+      .then(buf => {
+        instancedMesh = buildMesh(new Float32Array(buf));
+      })
+      .catch(() => {
+        // Fallback procedural distribution if offline
+        const count = 15000;
+        const fallback = new Float32Array(count * 3);
+        for (let i = 0; i < count; i++) {
+          const theta = Math.random() * Math.PI * 2;
+          const phi = Math.acos(2 * Math.random() - 1);
+          const r = 10 + Math.pow(Math.random(), 0.7) * 45;
+          fallback[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+          fallback[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+          fallback[i * 3 + 2] = r * Math.cos(phi);
         }
+        instancedMesh = buildMesh(fallback);
+      });
+
+    // Mouse & Touch Parallax
+    window.addEventListener('mousemove', e => {
+      mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+      mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    }, { passive: true });
+
+    window.addEventListener('touchmove', e => {
+      if (e.touches && e.touches.length > 0) {
+        mouseX = (e.touches[0].clientX / window.innerWidth - 0.5) * 2;
+        mouseY = (e.touches[0].clientY / window.innerHeight - 0.5) * 2;
       }
     }, { passive: true });
 
-    function resizeCanvas() {
-      const rect = heroCurvesCanvas.getBoundingClientRect();
-      const screenW = rect.width || window.innerWidth || 320;
-      const screenH = rect.height || window.innerHeight || 160;
-      isPortrait = window.innerWidth <= 768 || screenW < screenH;
+    // Resize Handler
+    window.addEventListener('resize', () => {
+      const { w: newW, h: newH } = getDimensions();
+      camera.aspect = newW / newH;
+      camera.position.set(0, newW > 768 ? 6 : 5, newW > 768 ? 76 : 88);
+      camera.updateProjectionMatrix();
+      renderer.setSize(newW, newH);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      supernovaGroup.position.set(newW > 768 ? 10 : 0, newW > 768 ? 4 : 8, 0);
+    }, { passive: true });
 
-      if (isPortrait) {
-        // High-definition mobile buffer (240x420, crisp curves on all mobile screens)
-        W = 240;
-        H = 420;
-      } else {
-        // High-definition desktop buffer (480x260, crisp silky gradient curves)
-        W = 480;
-        H = 260;
-      }
-
-      heroCurvesCanvas.width = W;
-      heroCurvesCanvas.height = H;
-      img = ctx.createImageData(W, H);
-      d = img.data;
-      F = new Float32Array(W * H);
-    }
-
-    function field(x, y, t) {
-      // Portrait uses px = x * 3, py = y * 6; Landscape uses px = x * 6, py = y * 3
-      const px = isPortrait ? x * 3 : x * 6;
-      const py = isPortrait ? y * 6 : y * 3;
-      const wx = Math.sin(py * 0.9 + t * 0.6) + 0.5 * Math.sin(px * 1.7 - t * 0.4 + py * 0.5);
-      const wy = Math.sin(px * 1.1 - t * 0.5) + 0.5 * Math.sin(py * 1.3 + t * 0.35 + px * 0.8);
-      const qx = px + 0.8 * wx;
-      const qy = py + 0.8 * wy;
-      return Math.sin(qx * 1.2 + qy * 0.7 + t * 0.3) +
-             0.6 * Math.sin(qx * 0.5 - qy * 1.3 - t * 0.25) +
-             0.4 * Math.sin(qy * 1.1 + qx * 0.3 + t * 0.2);
-    }
-
-    function frame(ms) {
+    // Animation Loop
+    let t = 0;
+    function renderFrame() {
       if (!isVisible) return;
 
-      // Yield 100% CPU to the browser compositor during active touch/wheel scroll
-      if (isScrollPausing && window.scrollY > 20) {
-        if (!prefersReducedMotion) {
-          animId = requestAnimationFrame(frame);
-        }
-        return;
-      }
+      t += 0.0035;
+      targetRotY = mouseX * 0.35;
+      targetRotX = mouseY * 0.25;
 
-      // Throttle: 30fps on mobile (delta >= 33ms), 45fps on desktop (delta >= 22ms)
-      const minDelta = isPortrait ? 33 : 22;
-      if (ms - lastFrameMs < minDelta) {
-        if (!prefersReducedMotion) {
-          animId = requestAnimationFrame(frame);
-        }
-        return;
-      }
-      lastFrameMs = ms;
+      supernovaGroup.rotation.y += (t * 0.6 + targetRotY - supernovaGroup.rotation.y) * 0.04;
+      supernovaGroup.rotation.x += (Math.sin(t * 0.45) * 0.12 + targetRotX - supernovaGroup.rotation.x) * 0.04;
+      supernovaGroup.rotation.z = Math.cos(t * 0.35) * 0.08;
 
-      const t = ms / 1000;
-      for (let j = 0; j < H; j++) {
-        const rowOffset = j * W;
-        const yNorm = j / H;
-        for (let i = 0; i < W; i++) {
-          F[rowOffset + i] = field(i / W, yNorm, t);
-        }
-      }
+      starPoints.rotation.y = t * 0.9;
+      starPoints.rotation.x = t * 0.4;
 
-      const s = [];
-      const step = isPortrait ? 8 : 10;
-      for (let j = 0; j < H; j += step) {
-        const rowOffset = j * W;
-        for (let i = 0; i < W; i += step) {
-          s.push(F[rowOffset + i]);
-        }
-      }
-      s.sort((a, b) => a - b);
-      const lo = s[0];
-      const p70 = s[Math.floor(s.length * 0.8)];
-      const hi = s[s.length - 1];
-
-      for (let n = 0; n < W * H; n++) {
-        const v = F[n];
-        let r, g, bl;
-        if (v < p70 - w) {
-          const c = gc(v, lo, p70);
-          r = c[0];
-          g = c[1];
-          bl = c[2];
-        } else if (v < p70 + w) {
-          const x = gc(v, lo, p70);
-          const y = pc(v, p70, hi);
-          const tBlend = ss(p70 - w, p70 + w, v);
-          r = x[0] + (y[0] - x[0]) * tBlend;
-          g = x[1] + (y[1] - x[1]) * tBlend;
-          bl = x[2] + (y[2] - x[2]) * tBlend;
-        } else {
-          const c = pc(v, p70, hi);
-          r = c[0];
-          g = c[1];
-          bl = c[2];
-        }
-        const k = n * 4;
-        d[k] = r;
-        d[k + 1] = g;
-        d[k + 2] = bl;
-        d[k + 3] = 255;
-      }
-      ctx.putImageData(img, 0, 0);
+      renderer.render(scene, camera);
 
       if (!prefersReducedMotion) {
-        animId = requestAnimationFrame(frame);
+        animId = requestAnimationFrame(renderFrame);
       }
     }
 
-    resizeCanvas();
-    window.addEventListener('resize', () => {
-      resizeCanvas();
-      if (prefersReducedMotion) frame(performance.now());
-    }, { passive: true });
-
-    // Performance Observer: pause loop when hero is off-screen
+    // Performance Observer: pause render loop when hero is scrolled out of view
     if ('IntersectionObserver' in window) {
-      const heroObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
+      const heroObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
           if (entry.isIntersecting) {
             if (!isVisible) {
               isVisible = true;
-              animId = requestAnimationFrame(frame);
+              animId = requestAnimationFrame(renderFrame);
             }
           } else {
             isVisible = false;
@@ -303,10 +318,12 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
       }, { threshold: 0.01 });
-      heroObserver.observe(heroSection || heroCurvesCanvas);
+
+      const heroEl = document.getElementById('hero') || heroSupernovaCanvas;
+      heroObserver.observe(heroEl);
     }
 
-    animId = requestAnimationFrame(frame);
+    animId = requestAnimationFrame(renderFrame);
   }
 
   // --------------------------------------------------------------------------
