@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon.png" />
+  <link rel="icon" href="/assets/favicon.ico" sizes="any" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gallery & Posters Archive — ASCIITECH</title>
   <meta name="description" content="A curated waterfall gallery of all visual artworks, posters, and brand identities by ASCIITECH." />
@@ -487,7 +489,7 @@
     const grid = document.getElementById('waterfallGrid');
     grid.innerHTML = shuffledGallery.map((item, idx) => `
       <div class="item ${item.isLogo ? 'item-logo' : ''}" data-index="${idx}" data-src="${item.src}" ${item.isLogo ? 'data-is-logo="true"' : ''}>
-        <img src="${item.src}" alt="Artwork" loading="${idx < 18 ? 'eager' : 'lazy'}" decoding="async" />
+        <img src="${item.src}" alt="${item.isLogo ? 'Brand identity logo' : 'Poster and creative artwork'}" loading="${idx < 18 ? 'eager' : 'lazy'}" decoding="async" />
       </div>
     `).join('');
 

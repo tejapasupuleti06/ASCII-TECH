@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta charset="UTF-8">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -9,8 +11,10 @@
   "url": "https://www.asciitech.online/"
 }
 </script>
-<head>
-  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon.png">
+  <link rel="icon" href="/assets/favicon.ico" sizes="any">
   <meta name="description" content="ASCIITECH is a creative design studio specializing in website design, branding, graphic design and 3D rendering to help businesses build a strong visual identity.">
   <title>ASCII-TECH | Web Design, Branding, Graphic Design & 3D</title>
   <link rel="canonical" href="https://www.asciitech.online/">
@@ -23,6 +27,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="ASCIITECH | Web Design, Branding, Graphic Design & 3D">
   <meta name="twitter:description" content="ASCIITECH is a creative design studio specializing in website design, branding, graphic design and 3D rendering to help businesses build a strong visual identity.">
+  <meta name="twitter:image" content="https://www.asciitech.online/assets/logos/ascii%20new.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -37,7 +42,7 @@
 </head>
 <body>
   <!-- ================= 3D PEACOCK LOADING ANIMATION ================= -->
-  <div id="peacock-loader-overlay" class="peacock-loader-overlay" aria-label="Loading ASCIITECH" aria-live="polite">
+  <div id="peacock-loader-overlay" class="peacock-loader-overlay" role="status" aria-label="Loading ASCIITECH" aria-live="polite">
     <script>
       (function() {
         try {
@@ -82,7 +87,7 @@
   <div id="menu-scrim" class="menu-scrim" aria-hidden="true"></div>
 
   <!-- Right-Side Slide-in Navigation Panel (Matches Reference Design) -->
-  <aside 
+  <div 
     id="menu-panel" 
     class="menu-panel" 
     role="dialog" 
@@ -154,7 +159,7 @@
         </div>
       </div>
     </div>
-  </aside>
+  </div>
 
   <!-- Stage Container wrapping Hero and Core Disciplines -->
   <main class="stage">
@@ -177,7 +182,7 @@
       <!-- Layer 4: Hero Content (Headline & Minimal Corner Services) -->
       <div class="hero-content">
         <!-- Minimal Corner Services Badge -->
-        <div class="hero-services" aria-label="Specialized Disciplines">
+        <div class="hero-services" role="group" aria-label="Specialized Disciplines">
           <div class="hero-services-box">
             <ul class="hero-services-list">
               <li style="--s-index: 0">Website</li>
@@ -190,10 +195,10 @@
 
         <div class="hero-headline-block">
           <h1 class="hero-headline">
-            <div class="headline-mask line-1-mask">
+            <span class="headline-mask line-1-mask">
               <span class="headline-line line-1">Curated</span>
-            </div>
-            <div class="line-2-wrapper">
+            </span>
+            <span class="line-2-wrapper">
               <span class="headline-mask word-design-mask">
                 <span class="headline-line line-2">Design</span>
               </span>
@@ -203,7 +208,7 @@
                   <span class="headline-line line-2">Studio<span class="accent-dot">.</span></span>
                 </span>
               </span>
-            </div>
+            </span>
           </h1>
         </div>
       </div>
@@ -245,11 +250,11 @@
       <div class="crafted-track" id="crafted-track">
         <div class="crafted-stage" id="crafted-stage">
           <div class="crafted-layout">
-            <div class="it i1"><img alt="Coding at a laptop" src="assets/crafted/i1.jpg" loading="lazy"></div>
-            <div class="it i2"><img alt="Create poster" src="assets/crafted/i2.jpg" loading="lazy"></div>
-            <div class="it i3"><img alt="Digital face" src="assets/crafted/i3.jpg" loading="lazy"></div>
-            <div class="it i4"><img alt="Red striped car" src="assets/crafted/i4.jpg" loading="lazy"></div>
-            <div class="it i5"><img alt="Pixelated car detail" src="assets/crafted/i5.jpg" loading="lazy"></div>
+            <div class="it i1"><img alt="Coding at a laptop" src="assets/crafted/i1.jpg" loading="lazy" width="1000" height="625"></div>
+            <div class="it i2"><img alt="Create poster" src="assets/crafted/i2.jpg" loading="lazy" width="720" height="900"></div>
+            <div class="it i3"><img alt="Digital face" src="assets/crafted/i3.jpg" loading="lazy" width="800" height="800"></div>
+            <div class="it i4"><img alt="Red striped car" src="assets/crafted/i4.jpg" loading="lazy" width="900" height="675"></div>
+            <div class="it i5"><img alt="Pixelated car detail" src="assets/crafted/i5.jpg" loading="lazy" width="736" height="920"></div>
           </div>
           <h2 class="crafted-title">
             <span class="ln"><span>Crafted<span class="fr"> from</span></span></span>
@@ -289,7 +294,7 @@
         <h2 id="brand-heading" class="brand-heading reveal-item">Brand Identity Marks</h2>
 
         <!-- 5-Card Expanding Accordion Gallery with Direct PDF View -->
-        <ul class="brand-gallery reveal-item" role="region" aria-label="Brand identity marks gallery">
+        <ul class="brand-gallery reveal-item" aria-label="Brand identity marks gallery">
           <!-- Card 1: Active on load (Surprise Cakes mark) -->
           <li 
             class="brand-card is-active" 
@@ -302,8 +307,7 @@
             data-title="Surprise Cakes — Brand Deck"
           >
             <a href="assets/pdfs/surprise-cakes-deck.pdf" class="brand-card-link" aria-label="Open Surprise Cakes Brand Deck">
-              <img src="assets/logos/mark-01.png" alt="Surprise Cakes mark" class="logo-mark mark-seal" loading="eager" />
-            </a>
+              <img src="assets/logos/mark-01.png" alt="Surprise Cakes mark" class="logo-mark mark-seal" loading="eager" width="644" height="644" />            </a>
           </li>
 
           <!-- Card 2: The Rore Club mark -->
@@ -317,7 +321,7 @@
             data-title="The Rore Club — Brand Deck"
           >
             <a href="assets/pdfs/the-rore-club-deck.pdf" class="brand-card-link" aria-label="Open The Rore Club Brand Deck">
-              <img src="assets/logos/mark-02.png" alt="The Rore Club mark" class="logo-mark mark-r" loading="eager" />
+              <img src="assets/logos/mark-02.png" alt="The Rore Club mark" class="logo-mark mark-r" loading="eager" width="398" height="332" />
             </a>
           </li>
 
@@ -332,8 +336,7 @@
             data-title="Suzen — Brand Deck"
           >
             <a href="assets/pdfs/suzen-deck.pdf" class="brand-card-link" aria-label="Open Suzen Brand Deck">
-              <img src="assets/logos/mark-03.png" alt="Suzen mark" class="logo-mark mark-spiral" loading="eager" />
-            </a>
+              <img src="assets/logos/mark-03.png" alt="Suzen mark" class="logo-mark mark-spiral" loading="eager" width="210" height="210" />            </a>
           </li>
 
           <!-- Card 4: LXSH Designz mark -->
@@ -347,8 +350,7 @@
             data-title="LXSH Designz — Brand Deck"
           >
             <a href="assets/pdfs/lxsh-designz-deck.pdf" class="brand-card-link" aria-label="Open LXSH Designz Brand Deck">
-              <img src="assets/logos/mark-04.png" alt="LXSH Designz mark" class="logo-mark mark-figure" loading="eager" />
-            </a>
+              <img src="assets/logos/mark-04.png" alt="LXSH Designz mark" class="logo-mark mark-figure" loading="eager" width="482" height="481" />            </a>
           </li>
 
           <!-- Card 5: Maxify mark -->
@@ -362,8 +364,7 @@
             data-title="Maxify — Brand Deck"
           >
             <a href="assets/pdfs/maxify-deck.pdf" class="brand-card-link" aria-label="Open Maxify Brand Deck">
-              <img src="assets/logos/mark-05.png" alt="Maxify mark" class="logo-mark mark-maxity" loading="eager" />
-            </a>
+              <img src="assets/logos/mark-05.png" alt="Maxify mark" class="logo-mark mark-maxity" loading="eager" width="403" height="146" />            </a>
           </li>
         </ul>
       </div>
@@ -379,7 +380,6 @@
             loop 
             muted 
             playsinline 
-            webkit-playsinline
             preload="auto"
             aria-label="3D Motion Loop Animation"
           >
@@ -399,7 +399,7 @@
         <!-- 2-Column Responsive Project Grid -->
         <div class="showcase-grid reveal-item" role="region" aria-label="Flagship projects showcase">
           <!-- Tile 1: Surprise Cakes -->
-          <article 
+          <div 
             class="showcase-card" 
             tabindex="0" 
             role="link" 
@@ -408,30 +408,34 @@
             data-index="0"
           >
             <div class="showcase-media-frame">
-              <img 
-                src="assets/showcase/surprise-cakes-cover.jpg" 
-                alt="Surprise Cakes cover" 
-                class="showcase-media-img" 
+              <img
+                src="assets/showcase/surprise-cakes-cover.jpg"
+                alt="Surprise Cakes cover"
+                class="showcase-media-img"
                 loading="lazy"
+                width="1024"
+                height="576"
               />
               <div class="showcase-media-overlay" aria-hidden="true"></div>
               <div class="showcase-center-mark" aria-hidden="true">
                 <div class="showcase-logo-badge">
-                  <img 
-                    src="assets/showcase/logo-surprise-cakes.png" 
-                    alt="Surprise Cakes logo" 
-                    class="showcase-popup-logo"
-                  />
+                <img
+                  src="assets/showcase/logo-surprise-cakes.png"
+                  alt="Surprise Cakes logo"
+                  class="showcase-popup-logo"
+                  width="601"
+                  height="601"
+                />
                 </div>
               </div>
             </div>
             <div class="showcase-card-header">
               <h3 class="showcase-card-name">Surprise Cakes</h3>
             </div>
-          </article>
+          </div>
 
           <!-- Tile 2: The Rore Club -->
-          <article 
+          <div 
             class="showcase-card" 
             tabindex="0" 
             role="link" 
@@ -440,19 +444,23 @@
             data-index="1"
           >
             <div class="showcase-media-frame">
-              <img 
-                src="assets/showcase/rore-club-cover.jpg" 
-                alt="The Rore Club" 
-                class="showcase-media-img" 
+              <img
+                src="assets/showcase/rore-club-cover.jpg"
+                alt="The Rore Club"
+                class="showcase-media-img"
                 loading="lazy"
+                width="1024"
+                height="1024"
               />
               <div class="showcase-media-overlay" aria-hidden="true"></div>
               <div class="showcase-center-mark" aria-hidden="true">
                 <div class="showcase-logo-badge">
-                  <img 
-                    src="assets/showcase/logo-rore-club.png" 
-                    alt="The Rore Club logo" 
+                  <img
+                    src="assets/showcase/logo-rore-club.png"
+                    alt="The Rore Club logo"
                     class="showcase-popup-logo"
+                    width="601"
+                    height="601"
                   />
                 </div>
               </div>
@@ -460,10 +468,10 @@
             <div class="showcase-card-header">
               <h3 class="showcase-card-name">The Rore Club</h3>
             </div>
-          </article>
+          </div>
 
           <!-- Tile 3: PR Men Dot -->
-          <article 
+          <div 
             class="showcase-card" 
             tabindex="0" 
             role="link" 
@@ -472,19 +480,23 @@
             data-index="2"
           >
             <div class="showcase-media-frame">
-              <img 
-                src="assets/showcase/pr-men-dot-cover.jpg" 
-                alt="PR Men Dot" 
-                class="showcase-media-img" 
+              <img
+                src="assets/showcase/pr-men-dot-cover.jpg"
+                alt="PR Men Dot"
+                class="showcase-media-img"
                 loading="lazy"
+                width="1000"
+                height="667"
               />
               <div class="showcase-media-overlay" aria-hidden="true"></div>
               <div class="showcase-center-mark" aria-hidden="true">
                 <div class="showcase-logo-badge">
-                  <img 
-                    src="assets/showcase/logo-pr-men-dot.png" 
-                    alt="PR Men Dot logo" 
+                  <img
+                    src="assets/showcase/logo-pr-men-dot.png"
+                    alt="PR Men Dot logo"
                     class="showcase-popup-logo"
+                    width="601"
+                    height="601"
                   />
                 </div>
               </div>
@@ -492,10 +504,10 @@
             <div class="showcase-card-header">
               <h3 class="showcase-card-name">PR Men Dot</h3>
             </div>
-          </article>
+          </div>
 
           <!-- Tile 4: Arogya Thatibellam -->
-          <article 
+          <div 
             class="showcase-card" 
             tabindex="0" 
             role="link" 
@@ -504,19 +516,23 @@
             data-index="3"
           >
             <div class="showcase-media-frame">
-              <img 
-                src="assets/showcase/arogya-thatibellam-cover.jpg" 
-                alt="Arogya Thatibellam" 
-                class="showcase-media-img" 
+            <img
+                src="assets/showcase/arogya-thatibellam-cover.jpg"
+                alt="Arogya Thatibellam"
+                class="showcase-media-img"
                 loading="lazy"
+                width="1024"
+                height="576"
               />
               <div class="showcase-media-overlay" aria-hidden="true"></div>
               <div class="showcase-center-mark" aria-hidden="true">
                 <div class="showcase-logo-badge">
-                  <img 
-                    src="assets/showcase/logo-arogya.png" 
-                    alt="Arogya Thatibellam logo" 
+                  <img
+                    src="assets/showcase/logo-arogya.png"
+                    alt="Arogya Thatibellam logo"
                     class="showcase-popup-logo"
+                    width="601"
+                    height="601"
                   />
                 </div>
               </div>
@@ -524,7 +540,7 @@
             <div class="showcase-card-header">
               <h3 class="showcase-card-name">Arogya Thatibellam</h3>
             </div>
-          </article>
+          </div>
         </div>
       </div>
     </section>
@@ -543,8 +559,8 @@
                 <i class="ring circle" style="animation-delay:2.4s"></i>
                 <i class="ring circle" style="animation-delay:4.8s"></i>
                 <i class="ring circle" style="animation-delay:7.2s"></i>
-                <img class="sym inv" src="assets/services/ascii-s1.png" alt="Website ASCII Symbol" />
-              </div>
+                  <img class="sym inv" src="assets/services/ascii-s1.png" alt="Website ASCII Symbol" width="700" height="700" />  
+              </div>  
 
               <!-- Symbol 2: Graphic Designing (Square Wave Rings + Symbol 2) -->
               <div class="s s2" id="ascii-s2">
@@ -552,7 +568,7 @@
                 <i class="ring square" style="animation-delay:2.4s"></i>
                 <i class="ring square" style="animation-delay:4.8s"></i>
                 <i class="ring square" style="animation-delay:7.2s"></i>
-                <img class="sym inv" src="assets/services/ascii-s2.png" alt="Graphic Designing ASCII Symbol" />
+                <img class="sym inv" src="assets/services/ascii-s2.png" alt="Graphic Designing ASCII Symbol" width="700" height="530" />
               </div>
 
               <!-- Symbol 3: Branding (Diamond Wave Rings + 3D Torus Donut ASCII) -->
@@ -561,7 +577,7 @@
                 <i class="ring diamond" style="animation-delay:2.4s"></i>
                 <i class="ring diamond" style="animation-delay:4.8s"></i>
                 <i class="ring diamond" style="animation-delay:7.2s"></i>
-                <pre id="donut" class="sym abs" aria-label="abstract ASCII torus"></pre>
+                <pre id="donut" class="sym abs"></pre>
               </div>
 
               <!-- Symbol 4: 3D Rendering (Squircle Wave Rings + Symbol 4) -->
@@ -570,7 +586,7 @@
                 <i class="ring squircle" style="animation-delay:2.4s"></i>
                 <i class="ring squircle" style="animation-delay:4.8s"></i>
                 <i class="ring squircle" style="animation-delay:7.2s"></i>
-                <img class="sym inv" src="assets/services/ascii-s4.png" alt="3D Rendering ASCII Symbol" />
+                  <img class="sym inv" src="assets/services/ascii-s4.png" alt="3D Rendering ASCII Symbol" width="700" height="700" />
               </div>
             </div>
           </div>
@@ -773,7 +789,7 @@
             <!-- Column 5: Follow us (Circular Icon Buttons) -->
             <div class="footer-col footer-col-social reveal-item" style="--col-idx: 4">
               <h3 class="footer-col-heading">Follow us</h3>
-              <div class="footer-social-row" aria-label="Social media channels">
+              <div class="footer-social-row" role="group" aria-label="Social media channels">
                 <!-- WhatsApp -->
                 <a href="https://wa.me/919701173777?text=Hi%20ASCIITECH%2C%20I%20would%20like%20to%20enquire%20about%20a%20project." target="_blank" rel="noopener noreferrer" class="social-circle-btn" aria-label="Message ASCIITECH on WhatsApp">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
@@ -819,7 +835,7 @@
             <div class="pdf-spinner"></div>
             <span>Loading brand deck...</span>
           </div>
-          <iframe id="pdfViewerFrame" class="pdf-frame" src="" title="Brand Deck PDF Viewer"></iframe>
+          <iframe id="pdfViewerFrame" class="pdf-frame" title="Brand Deck PDF Viewer"></iframe>
         </div>
       </div>
     </div>
