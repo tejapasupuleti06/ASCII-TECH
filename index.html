@@ -45,6 +45,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <!-- Three.js 3D Engine -->
+  <script src="assets/loader/three.min.js"></script>
   <!-- Lenis Smooth Inertial Scrolling -->
   <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
   <!-- Vercel Web Analytics -->
@@ -178,8 +180,8 @@
   <main class="stage">
     <!-- Pinned / Sticky Hero Section -->
     <section class="hero-section" id="hero" aria-label="Hero Introduction">
-      <!-- Flowing Curves Animated Canvas completely replacing static hero image -->
-      <canvas id="hero-flowing-curves" class="hero-curves-canvas" aria-hidden="true"></canvas>
+      <!-- Wire Terrain WebGL Background (Originkit, matching ASCIITECH palette) -->
+      <canvas id="hero-wire-terrain" class="hero-terrain-canvas" aria-hidden="true"></canvas>
 
       <!-- Layer 2: Texture Overlays -->
       <svg class="hero-noise-overlay" aria-hidden="true">
@@ -192,8 +194,10 @@
       <!-- Layer 3: Bottom Gradient Scrim for Legibility over Amber Highlights -->
       <div class="hero-scrim" aria-hidden="true"></div>
 
-      <!-- Layer 4: Hero Content (Headline & Minimal Corner Services) -->
+      <!-- Layer 4: Hero Content (Headline & Studio Services) -->
       <div class="hero-content">
+<<<<<<< HEAD
+=======
         <!-- Minimal Corner Services Badge -->
         <div class="hero-services" role="group" aria-label="Specialized Disciplines">
           <div class="hero-services-box">
@@ -206,6 +210,7 @@
           </div>
         </div>
 
+>>>>>>> 9a6fcffe5ed94087b364dbd1ab167ae83b0ea304
         <div class="hero-headline-block">
           <h1 class="hero-headline" aria-label="ASCIITECH — Curated Design Studio">
             <span class="headline-mask line-1-mask">
@@ -216,6 +221,15 @@
                 <span class="headline-line line-2">Design</span>
               </span>
               <span class="studio-container">
+                <!-- Services list placed directly above Studio (no box) -->
+                <div class="hero-services" aria-label="Specialized Disciplines">
+                  <ul class="hero-services-list">
+                    <li style="--s-index: 0">Website</li>
+                    <li style="--s-index: 1">Branding</li>
+                    <li style="--s-index: 2">Graphic Designing</li>
+                    <li style="--s-index: 3">3D Rendering</li>
+                  </ul>
+                </div>
                 <!-- Word 'Studio' with mobile accent dot -->
                 <span class="headline-mask word-studio-mask">
                   <span class="headline-line line-2">Studio<span class="accent-dot">.</span></span>
@@ -400,6 +414,24 @@
             <source src="assets/videos/motion_animation_mobile.mp4" type="video/mp4" media="(max-width: 768px)" />
             <source src="assets/videos/motion_animation.mp4" type="video/mp4" />
           </video>
+
+          <!-- Editorial Typographic Overlay matching Reference (Image 3) -->
+          <div class="motion-video-overlay" aria-hidden="true">
+            <div class="motion-overlay-top">
+              <div class="motion-overlay-barcode">
+                <span class="barcode-lines">||||||||||||||||||||||||||</span>
+                <span class="barcode-year">&copy; 2021&ndash;26</span>
+              </div>
+              <div class="motion-overlay-tag">Design built<br>with intent</div>
+            </div>
+            <div class="motion-overlay-bottom">
+              <p class="motion-overlay-quote">
+                Between Ideas and Execution.<br>
+                Always evolving. Always refining.<br>
+                Design is never static, and neither are we.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -856,7 +888,6 @@
   </main>
 
   <!-- 3D Peacock Loader Scripts -->
-  <script src="assets/loader/three.min.js"></script>
   <script src="assets/loader/peacock_model.js"></script>
   <script src="assets/loader/peacock-animation.js"></script>
   <script>
