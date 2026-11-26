@@ -487,8 +487,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         raf = requestAnimationFrame(frame);
 
-        // Pointer steer interaction
+        // Pointer steer interaction:
+        // On mobile view, the hero background runs ONLY the autonomous scenic flight animation
+        // without distortion from hand gestures/touch.
+        // Steering is exclusively active on laptop/desktop with mouse cursor movement.
         window.addEventListener('pointermove', (e) => {
+          if (e.pointerType === 'touch' || window.innerWidth < 768) {
+            pointer.active = false;
+            return;
+          }
           pointer.nx = Math.max(-1, Math.min(1, (e.clientX / window.innerWidth) * 2 - 1));
           pointer.ny = Math.max(-1, Math.min(1, (e.clientY / window.innerHeight) * 2 - 1));
           pointer.active = true;
@@ -1133,128 +1140,189 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // Capabilities & Services Section Interaction (Animated ASCII Symbols)
+  // Capabilities & Services: Hover Image Reveal (Originkit)
   // --------------------------------------------------------------------------
-  const serviceRows = document.querySelectorAll('.service-row');
-  const serviceCaptionText = document.getElementById('service-caption-text');
-  const asciiSymbols = document.querySelectorAll('.ascii-preview-stage .s');
+  (function initHoverImageReveal() {
+    const container = document.getElementById('hover-image-reveal');
+    const floatingCard = document.getElementById('reveal-floating-card');
+    const textItems = document.querySelectorAll('.reveal-text-item');
+    const itemsList = document.querySelector('.reveal-items-list');
+    const imageItems = document.querySelectorAll('.reveal-image-item');
+    const servicesSection = document.getElementById('services');
 
-  if (serviceRows.length) {
-    const activateService = (row) => {
-      if (row.classList.contains('is-active')) return;
+    if (!container || !floatingCard || !textItems.length) return;
 
-      serviceRows.forEach((r) => {
-        r.classList.remove('is-active');
-        r.setAttribute('aria-pressed', 'false');
-      });
+    let hoveredIndex = null;
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let vx = 0;
+    let vy = 0;
+    let isMoving = false;
+    let isSectionVisible = true;
+    let lastTime = performance.now();
 
-      row.classList.add('is-active');
-      row.setAttribute('aria-pressed', 'true');
+    // Framer Motion spring physics matching config: stiffness 60, damping 28, mass 0.5
+    const stiffness = 60;
+    const damping = 28;
+    const mass = 0.5;
 
-      const asciiId = row.getAttribute('data-ascii') || 's1';
-
-      // Switch active ASCII Symbol block
-      asciiSymbols.forEach((s) => {
-        s.classList.remove('is-active');
-      });
-      const activeSymbol = document.getElementById(`ascii-${asciiId}`);
-      if (activeSymbol) {
-        activeSymbol.classList.add('is-active');
-      }
-
-      if (serviceCaptionText) {
-        const nextCaption = row.getAttribute('data-caption') || '';
-        if (prefersReducedMotion) {
-          serviceCaptionText.textContent = nextCaption;
+    function updateImages(index) {
+      imageItems.forEach((img, i) => {
+        img.classList.remove('pos-above', 'pos-current', 'pos-below');
+        if (index === null) {
+          img.classList.add('pos-below');
+        } else if (i < index) {
+          img.classList.add('pos-above');
+        } else if (i === index) {
+          img.classList.add('pos-current');
         } else {
-          serviceCaptionText.style.transition = 'opacity 0.16s cubic-bezier(0.16, 1, 0.3, 1), transform 0.16s cubic-bezier(0.16, 1, 0.3, 1)';
-          serviceCaptionText.style.opacity = '0';
-          serviceCaptionText.style.transform = 'translateY(6px)';
-
-          setTimeout(() => {
-            serviceCaptionText.textContent = nextCaption;
-            serviceCaptionText.style.transition = 'opacity 0.32s cubic-bezier(0.16, 1, 0.3, 1), transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)';
-            serviceCaptionText.style.opacity = '1';
-            serviceCaptionText.style.transform = 'translateY(0)';
-          }, 160);
-        }
-      }
-    };
-
-    serviceRows.forEach((row) => {
-      row.addEventListener('mouseenter', () => activateService(row));
-      row.addEventListener('focus', () => activateService(row));
-      row.addEventListener('click', () => activateService(row));
-      row.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          activateService(row);
+          img.classList.add('pos-below');
         }
       });
-    });
-  }
-
-  // --------------------------------------------------------------------------
-  // ASCII Donut Animation for Branding Service
-  // --------------------------------------------------------------------------
-  (function initAsciiDonut() {
-    const el = document.getElementById('donut');
-    if (!el) return;
-    const W = 64, H = 28, ch = '.,-~:;=!*#$@';
-    let A = 0, B = 0, lastDonutT = 0;
-
-    function renderDonutFrame() {
-      const b = new Array(W * H).fill(' ');
-      const z = new Array(W * H).fill(0);
-      const s = Math.sin, c0 = Math.cos;
-      for (let j = 0; j < 6.28; j += 0.08) {
-        for (let i = 0; i < 6.28; i += 0.035) {
-          const c = s(i), d = c0(j), e = s(A), f = s(j), g = c0(A), h = d + 2,
-                D = 1 / (c * h * e + f * g + 5), l = c0(i), m = c0(B), n = s(B), t = c * h * g - f * e,
-                x = 0 | (W / 2 + 34 * D * (l * h * m - t * n)),
-                y = 0 | (H / 2 + 16 * D * (l * h * n + t * m)),
-                o = x + W * y,
-                N = 0 | (8 * ((f * e - c * d * g) * m - c * d * e - f * g - l * d * n));
-          if (y >= 0 && y < H && x >= 0 && x < W && D > z[o]) {
-            z[o] = D;
-            b[o] = ch[N > 0 ? N : 0];
-          }
-        }
-      }
-      let out = '';
-      for (let k = 0; k < W * H; k++) {
-        out += b[k];
-        if (k % W === W - 1) out += '\n';
-      }
-      el.textContent = out;
-      A += 0.04;
-      B += 0.025;
     }
 
-    renderDonutFrame();
-
-    if (!prefersReducedMotion) {
-      let isDonutVisible = false;
-      const servicesSection = document.getElementById('services');
-      if ('IntersectionObserver' in window && servicesSection) {
-        const donutObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            isDonutVisible = entry.isIntersecting;
-          });
-        }, { threshold: 0.05 });
-        donutObserver.observe(servicesSection);
+    function setHovered(index) {
+      hoveredIndex = index;
+      if (index !== null) {
+        floatingCard.classList.add('is-visible');
+        if (itemsList) itemsList.classList.add('has-active');
+        textItems.forEach((item, i) => {
+          if (i === index) {
+            item.classList.add('is-hovered');
+            item.setAttribute('aria-expanded', 'true');
+          } else {
+            item.classList.remove('is-hovered');
+            item.setAttribute('aria-expanded', 'false');
+          }
+        });
+        updateImages(index);
       } else {
-        isDonutVisible = true;
+        floatingCard.classList.remove('is-visible');
+        if (itemsList) itemsList.classList.remove('has-active');
+        textItems.forEach((item) => {
+          item.classList.remove('is-hovered');
+          item.setAttribute('aria-expanded', 'false');
+        });
+        updateImages(null);
+      }
+    }
+
+    function onPointerMove(e) {
+      const rect = container.getBoundingClientRect();
+      const cardWidth = floatingCard.offsetWidth || 300;
+      const cardHeight = floatingCard.offsetHeight || 400;
+
+      // Default offsetX = 200, offsetY = 0 from Originkit
+      let offsetX = 200;
+      if (window.innerWidth < 900) {
+        offsetX = 0; // centered horizontally on mobile/touch
       }
 
-      function donutLoop(t) {
-        if (isDonutVisible && (t - lastDonutT > 40)) {
-          renderDonutFrame();
-          lastDonutT = t;
+      const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+      const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+
+      const mouseX = clientX - rect.left;
+      const mouseY = clientY - rect.top;
+
+      // Boundary clamping inside container
+      const minX = cardWidth / 2 + 10;
+      const maxX = Math.max(minX, rect.width - cardWidth / 2 - 10);
+      const minY = cardHeight / 2 + 10;
+      const maxY = Math.max(minY, rect.height - cardHeight / 2 - 10);
+
+      targetX = Math.max(minX, Math.min(maxX, mouseX + offsetX));
+      targetY = Math.max(minY, Math.min(maxY, mouseY));
+
+      if (!isMoving) {
+        isMoving = true;
+        if (currentX === 0 && currentY === 0) {
+          currentX = targetX;
+          currentY = targetY;
         }
-        requestAnimationFrame(donutLoop);
+        lastTime = performance.now();
+        requestAnimationFrame(tick);
       }
-      requestAnimationFrame(donutLoop);
+    }
+
+    function tick(now) {
+      if (!isSectionVisible) {
+        isMoving = false;
+        return;
+      }
+
+      const dt = Math.min((now - lastTime) / 1000, 0.05) || 0.016;
+      lastTime = now;
+
+      if (prefersReducedMotion) {
+        currentX = targetX;
+        currentY = targetY;
+        vx = 0;
+        vy = 0;
+      } else {
+        // 2nd-order spring physics simulation (stiffness: 60, damping: 28, mass: 0.5)
+        const fx = -stiffness * (currentX - targetX) - damping * vx;
+        const fy = -stiffness * (currentY - targetY) - damping * vy;
+
+        const ax = fx / mass;
+        const ay = fy / mass;
+
+        vx += ax * dt;
+        vy += ay * dt;
+
+        currentX += vx * dt;
+        currentY += vy * dt;
+      }
+
+      floatingCard.style.transform = `translate3d(calc(${currentX.toFixed(2)}px - 50%), calc(${currentY.toFixed(2)}px - 50%), 0)`;
+
+      const stillOscillating = Math.abs(vx) > 0.1 || Math.abs(vy) > 0.1 || Math.abs(currentX - targetX) > 0.5 || Math.abs(currentY - targetY) > 0.5;
+
+      if (hoveredIndex !== null || stillOscillating) {
+        requestAnimationFrame(tick);
+      } else {
+        isMoving = false;
+      }
+    }
+
+    container.addEventListener('mousemove', onPointerMove, { passive: true });
+    container.addEventListener('mouseleave', () => {
+      setHovered(null);
+    });
+
+    textItems.forEach((item, index) => {
+      item.addEventListener('mouseenter', () => {
+        setHovered(index);
+      });
+      item.addEventListener('focus', () => {
+        setHovered(index);
+      });
+      item.addEventListener('blur', () => {
+        setHovered(null);
+      });
+      item.addEventListener('touchstart', (e) => {
+        onPointerMove(e);
+        setHovered(index);
+      }, { passive: true });
+      item.addEventListener('click', () => {
+        setHovered(index);
+      });
+    });
+
+    // Pause physics if services section is scrolled off-screen
+    if ('IntersectionObserver' in window && servicesSection) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          isSectionVisible = entry.isIntersecting;
+          if (isSectionVisible && hoveredIndex !== null && !isMoving) {
+            isMoving = true;
+            lastTime = performance.now();
+            requestAnimationFrame(tick);
+          }
+        });
+      }, { threshold: 0.05 });
+      observer.observe(servicesSection);
     }
   })();
 
