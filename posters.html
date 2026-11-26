@@ -5,20 +5,20 @@
   <link rel="icon" type="image/png" sizes="64x64" href="/assets/favicon.png" />
   <link rel="icon" href="/assets/favicon.ico" sizes="any" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gallery & Posters Archive — ASCIITECH</title>
-  <meta name="description" content="A curated waterfall gallery of all visual artworks, posters, and brand identities by ASCIITECH." />
+  <title>Poster Design Gallery | Creative Posters & Artwork — ASCIITECH</title>
+  <meta name="description" content="Explore creative poster designs, graphic artwork and visual identities in the ASCIITECH poster design gallery." />
   <link rel="canonical" href="https://www.asciitech.online/posters.html" />
 
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Gallery & Posters Archive — ASCIITECH" />
-  <meta property="og:description" content="Explore the visual artworks, posters and brand identities created by ASCIITECH." />
+  <meta property="og:title" content="Poster Design Gallery | Creative Posters & Artwork — ASCIITECH" />
+  <meta property="og:description" content="Explore creative poster designs, graphic artwork and visual identities in the ASCIITECH poster design gallery." />
   <meta property="og:url" content="https://www.asciitech.online/posters.html" />
   <meta property="og:image" content="https://www.asciitech.online/assets/logos/ascii%20new.svg" />
   <meta property="og:image:alt" content="ASCIITECH creative design studio logo" />
 
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Gallery & Posters Archive — ASCIITECH" />
-  <meta name="twitter:description" content="Explore the visual artworks, posters and brand identities created by ASCIITECH." />
+  <meta name="twitter:title" content="Poster Design Gallery | Creative Posters & Artwork — ASCIITECH" />
+  <meta name="twitter:description" content="Explore creative poster designs, graphic artwork and visual identities in the ASCIITECH poster design gallery." />
   <meta name="twitter:image" content="https://www.asciitech.online/assets/logos/ascii%20new.svg" />
 
   <!-- Google Fonts: Poppins & JetBrains Mono -->
@@ -360,6 +360,32 @@
         display: none;
       }
     }
+    .gallery-intro {
+      width: 80vw;
+      max-width: 1600px;
+      margin: 96px auto -82px;
+      padding: 0 0 1rem;
+      text-align: center;
+    }
+    .gallery-intro h1 {
+      font-size: clamp(1.15rem, 2.1vw, 1.8rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+    }
+    .gallery-intro p {
+      max-width: 760px;
+      margin: 0.55rem auto 0;
+      font-size: clamp(0.78rem, 1vw, 0.92rem);
+      line-height: 1.7;
+      color: #555;
+    }
+    @media (max-width: 900px) {
+      .gallery-intro { width: 90vw; margin-top: 84px; margin-bottom: -70px; }
+    }
+    @media (max-width: 600px) {
+      .gallery-intro { width: 92vw; margin-top: 76px; margin-bottom: -60px; }
+    }
+
     .sr-only {
         position: absolute;
         width: 1px;
@@ -386,9 +412,14 @@
     </a>
   </header>
 
+  <!-- Search-readable introduction is kept outside the dynamically populated gallery. -->
+  <section class="gallery-intro" aria-labelledby="gallery-heading">
+    <h1 id="gallery-heading">Creative Poster Design Gallery</h1>
+    <p>Explore poster design, creative poster artwork and graphic compositions from ASCIITECH, a curated design studio.</p>
+  </section>
+
   <!-- Waterfall Gallery Grid (Populated & Shuffled dynamically) -->
-  <main class="waterfall" id="waterfallGrid">
-  <h1 class="sr-only">Poster, Artwork & Brand Identity Gallery — ASCIITECH</h1>
+  <main class="waterfall" id="waterfallGrid" aria-label="Poster and artwork portfolio">
   </main>
 
   <!-- Fullscreen Lightbox Modal -->
@@ -489,7 +520,7 @@
     const grid = document.getElementById('waterfallGrid');
     grid.innerHTML = shuffledGallery.map((item, idx) => `
       <div class="item ${item.isLogo ? 'item-logo' : ''}" data-index="${idx}" data-src="${item.src}" ${item.isLogo ? 'data-is-logo="true"' : ''}>
-        <img src="${item.src}" alt="${item.isLogo ? 'Brand identity logo' : 'Poster and creative artwork'}" loading="${idx < 18 ? 'eager' : 'lazy'}" decoding="async" />
+        <img src="${item.src}" alt="${item.isLogo ? 'ASCIITECH brand identity logo artwork' : 'ASCIITECH poster design artwork ' + item.src.split('/').pop().replace(/\.(jpg|jpeg|png|webp)$/i, '').replace(/[-_]/g, ' ')}" loading="${idx < 18 ? 'eager' : 'lazy'}" decoding="async" />
       </div>
     `).join('');
 

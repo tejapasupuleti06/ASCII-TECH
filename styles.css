@@ -3420,3 +3420,20 @@ body.header--solid .footer-wordmark {
     grid-column: 1 / -1; /* Follow us */
   }
 }
+
+
+/* Compact supporting copy for service discoverability; preserves the existing visual theme. */
+.discipline-seo-copy {
+  max-width: 850px;
+  margin: 1.25rem auto 0;
+  text-align: center;
+  color: var(--color-secondary);
+  font-size: clamp(0.78rem, 1vw, 0.95rem);
+  line-height: 1.7;
+}
+.discipline-seo-copy a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-underline-offset: 3px;
+}
