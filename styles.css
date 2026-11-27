@@ -25,6 +25,45 @@
 }
 
 /* ==========================================================================
+   Global Polish & Micro-Interactions (Luxury Agency Aesthetic)
+   ========================================================================== */
+
+/* Brand Accent Text Selection Highlight */
+::selection {
+  background-color: #FF8C1A;
+  color: #0c0b0a;
+}
+
+::-moz-selection {
+  background-color: #FF8C1A;
+  color: #0c0b0a;
+}
+
+/* Custom Sleek Obsidian / Amber Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0c0b0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 140, 26, 0.4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FF8C1A;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 140, 26, 0.45) #0c0b0a;
+}
+
+/* ==========================================================================
    3D Peacock Loading Animation Overlay (Pure White on Pure Black)
    ========================================================================== */
 .peacock-loader-overlay {

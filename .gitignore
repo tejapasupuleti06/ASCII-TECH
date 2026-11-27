@@ -1,0 +1,26 @@
+# Environment & Secret files
+.env
+.env.local
+.env.*.local
+*.env
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs & Debug
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Node / Build Artifacts
+node_modules/
+.vercel
+dist/
+build/
+
+# Scratch & Temporary Testing Files
+scratch/
+scratch_*
+*.tmp
