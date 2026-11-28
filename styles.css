@@ -2545,7 +2545,7 @@ body.pdf-modal-open {
     margin-right: calc(50% - 50vw);
     height: auto !important;
     min-height: 0 !important;
-    aspect-ratio: 9 / 16;
+    aspect-ratio: 2160 / 3358;
     background-color: #0c0b0a;
     padding: 0 !important;
     margin-top: 0 !important;
@@ -2569,7 +2569,7 @@ body.pdf-modal-open {
     border-radius: 0 !important;
     border: none !important;
     box-shadow: none !important;
-    aspect-ratio: 9 / 16 !important;
+    aspect-ratio: 2160 / 3358 !important;
     background: #0c0b0a;
   }
   .motion-video-media {

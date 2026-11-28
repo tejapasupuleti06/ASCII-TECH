@@ -740,24 +740,6 @@ document.addEventListener('DOMContentLoaded', () => {
         stagger: 0.12,
         scrollTrigger: { trigger: '.cd', start: 'top 70%', once: true }
       });
-
-      // Desktop pinned scroll stepping through panels
-      if (window.matchMedia('(min-width: 861px)').matches) {
-        let last = 0;
-        ScrollTrigger.create({
-          trigger: '.cd',
-          start: 'top top',
-          end: '+=250%',
-          pin: true,
-          onUpdate(s) {
-            const i = Math.min(3, Math.floor(s.progress * 4));
-            if (i !== last) {
-              last = i;
-              setActive(i);
-            }
-          }
-        });
-      }
     }
   })();
 
@@ -1472,10 +1454,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const barrel = document.getElementById('barrel');
     const shape = document.getElementById('shape');
     const orb = document.getElementById('orb');
-    const colA = '#FF8C1A', colB = '#0c0b0a';
 
     function updateProcess(p) {
-      const s = Math.min(3, (p / 0.78) * 3);
+      const s = Math.min(3, p * 3);
       drawShape(s);
       if (barrel) gsap.set(barrel, { rotateX: -s * 90 });
       cpFaces.forEach((f, i) => f.style.opacity = Math.max(0, 1 - Math.abs(i - s) * 0.9));
@@ -1485,11 +1466,7 @@ document.addEventListener('DOMContentLoaded', () => {
         orb.setAttribute('cx', (92 * Math.sin(a)).toFixed(2));
         orb.setAttribute('cy', (-92 * Math.cos(a)).toFixed(2));
       }
-      /* Flood: shape smoothly expands and interpolates into #0c0b0a directly connecting into dark footer */
-      const q = Math.max(0, (p - 0.72) / 0.28);
-      if (shape) gsap.set(shape, { rotate: s * 40 + q * 90, scale: 1 + Math.pow(q, 3) * 26 });
-      if (blob) blob.style.fill = q > 0 ? gsap.utils.interpolate(colA, colB, Math.min(1, Math.max(0, (q - 0.4) / 0.6))) : '';
-      gsap.set('.cp .lf', { opacity: 1 - Math.min(1, q * 2.2) });
+      if (shape) gsap.set(shape, { rotate: s * 40 });
     }
 
     if (prefersReducedMotion) {
@@ -1507,11 +1484,11 @@ document.addEventListener('DOMContentLoaded', () => {
         gsap.from('.cp .rt', { scale: 0.3, opacity: 0, duration: 1.4, ease: 'elastic.out(1,.6)', scrollTrigger: once });
       }
 
-      // Single pinned scroll (100vh) - after this scroll, Let's talk and footer appear immediately
+      // Single pinned scroll (75vh) for 4 drum stages, then immediately transitions directly to footer
       ScrollTrigger.create({
         trigger: '#process',
         start: 'top top',
-        end: '+=100%',
+        end: '+=75%',
         pin: true,
         scrub: 0.5,
         onUpdate: s => updateProcess(s.progress)
