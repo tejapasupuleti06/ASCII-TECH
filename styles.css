@@ -114,7 +114,7 @@ html {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 /* Lenis smooth scroll recommended base rules */
@@ -136,7 +136,7 @@ body {
   min-height: 100svh;
   background-color: var(--color-primary); /* #E5E5E5 default canvas */
   color: var(--color-secondary);           /* #646464 default text */
-  overflow-x: clip;
+  overflow-x: hidden;
   overflow-y: visible;
   position: relative;
 }
@@ -440,7 +440,9 @@ body.menu-open .menu-toggle[aria-expanded="true"] .line-bot {
   background-color: var(--color-primary);
   color: var(--color-deep);
   transform: translateX(100%);
-  transition: transform 500ms var(--ease-panel);
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 500ms var(--ease-panel), visibility 500ms;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -449,6 +451,8 @@ body.menu-open .menu-toggle[aria-expanded="true"] .line-bot {
 
 .menu-panel.is-open {
   transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .panel-inner {
@@ -2984,6 +2988,7 @@ body.pdf-modal-open {
   position: sticky;
   top: 0;
   height: 100vh;
+  height: 100svh;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -3031,7 +3036,7 @@ body.pdf-modal-open {
 .pth .lab {
   position: absolute;
   font-family: var(--font-display);
-  font-size: clamp(22px, 3.4vw, 44px);
+  font-size: clamp(20px, 3.4vw, 44px);
   font-weight: 700;
   letter-spacing: -0.02em;
   color: #ffffff;
@@ -3039,6 +3044,13 @@ body.pdf-modal-open {
   transform: translateY(20px);
   pointer-events: none;
   text-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .pth .lab {
+    font-size: clamp(16px, 4.8vw, 24px);
+  }
 }
 
 /* 2. Light Section with Live Counters */
@@ -3096,6 +3108,7 @@ body.pdf-modal-open {
 /* 3. Circle Reveal Section Transition seamlessly revealing Founders */
 .cr {
   height: 100vh;
+  height: 100svh;
   position: relative;
   overflow: hidden;
   width: 100%;
@@ -3133,6 +3146,7 @@ body.pdf-modal-open {
   background: var(--color-accent);
   color: #ffffff;
   clip-path: circle(0% at 50% 50%);
+  -webkit-clip-path: circle(0% at 50% 50%);
   z-index: 2;
   display: flex;
   flex-direction: column;
@@ -3336,6 +3350,7 @@ body.pdf-modal-open {
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
   will-change: transform;
 }
 
@@ -3347,7 +3362,9 @@ body.pdf-modal-open {
   border-radius: 24px;
   padding: clamp(20px, 3vh, 32px) clamp(22px, 3vw, 36px);
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   transform: rotateX(calc(var(--i) * 90deg)) translateZ(calc(var(--h) / 2));
+  -webkit-transform: rotateX(calc(var(--i) * 90deg)) translateZ(calc(var(--h) / 2));
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
@@ -3456,8 +3473,15 @@ body.pdf-modal-open {
 @media (max-width: 860px) {
   .cp {
     grid-template-columns: 1fr;
-    padding: 8vh 5vw 6vh;
+    padding: 6vh 5vw 4vh;
     align-items: start;
+    height: 100vh;
+    height: 100svh;
+    min-height: 520px;
+  }
+  .drum {
+    --h: clamp(220px, 32vh, 280px);
+    margin-bottom: 0;
   }
   .rt {
     position: absolute;
@@ -3729,12 +3753,20 @@ body.header--solid .footer-wordmark {
 
 @media (max-width: 768px) {
   .ft {
-    min-height: 50vh;
+    min-height: 44vh;
     padding: 6vh 4vw 4vh;
   }
 
+  .ft h2[data-scr] {
+    font-size: clamp(38px, 12vw, 76px);
+  }
+
+  .cta-btn-wrap {
+    margin-top: 32px;
+  }
+
   .btn {
-    padding: 18px 38px;
+    padding: 16px 36px;
     font-size: 16px;
   }
 
