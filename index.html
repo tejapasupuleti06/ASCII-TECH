@@ -227,33 +227,33 @@
     </section>
 
 
-    <!-- Core Disciplines Section (Flat Opaque Sheet sliding over Hero) -->
-    <section class="disciplines-section" id="core-disciplines" aria-labelledby="disciplines-heading">
-      <div class="disciplines-container">
-        <h2 id="disciplines-heading" class="disciplines-heading reveal-item">Core Disciplines</h2>
-
-        <div class="disciplines-grid">
-          <!-- Card 1: Featured Website with Centered Label -->
-          <article class="discipline-card featured-card reveal-item" style="--card-index: 1" tabindex="0">
-            <span class="featured-pill">FEATURED</span>
-            <h3 class="card-title">WEBSITE</h3>
+    <!-- ================= CORE DISCIPLINES SECTION (Expanding Panels) ================= -->
+    <section class="cd" id="core-disciplines" aria-labelledby="ttl">
+      <div class="cd-container">
+        <h2 id="ttl">Core Disciplines</h2>
+        <div class="row">
+          <article class="pn on" tabindex="0" role="button" aria-expanded="true" data-index="0">
+            <span class="num">01</span><h3 class="vt">Website</h3>
+            <div class="art"><div class="win"><b></b><b></b><b></b><b></b></div></div>
+            <div class="body"><span class="feat">FEATURED</span><h3>Website</h3><p>Fast, animated sites built to turn visitors into clients.</p><ul class="tags"><li>Design</li><li>Build</li><li>Motion</li></ul></div>
           </article>
-
-          <!-- Card 2: Branding with Centered Label -->
-          <article class="discipline-card reveal-item" style="--card-index: 2" tabindex="0">
-            <h3 class="card-title">BRANDING</h3>
+          <article class="pn" tabindex="0" role="button" aria-expanded="false" data-index="1">
+            <span class="num">02</span><h3 class="vt">Branding</h3>
+            <div class="art"><div class="rings"><i></i><i></i><i></i></div></div>
+            <div class="body"><h3>Branding</h3><p>Identities and systems that people remember at a glance.</p><ul class="tags"><li>Logo</li><li>Guidelines</li><li>Voice</li></ul></div>
           </article>
-
-          <!-- Card 3: Graphic Designing with Centered Label -->
-          <article class="discipline-card reveal-item" style="--card-index: 3" tabindex="0">
-            <h3 class="card-title">GRAPHIC DESIGNING</h3>
+          <article class="pn" tabindex="0" role="button" aria-expanded="false" data-index="2">
+            <span class="num">03</span><h3 class="vt">Graphic Designing</h3>
+            <div class="art"><div class="shapes"><i></i><i></i><i></i></div></div>
+            <div class="body"><h3>Graphic Designing</h3><p>Posters, social and print work with a clear point of view.</p><ul class="tags"><li>Social</li><li>Print</li><li>Packaging</li></ul></div>
           </article>
-
-          <!-- Card 4: 3D Rendering with Centered Label -->
-          <article class="discipline-card reveal-item" style="--card-index: 4" tabindex="0">
-            <h3 class="card-title">3D RENDERING</h3>
+          <article class="pn" tabindex="0" role="button" aria-expanded="false" data-index="3">
+            <span class="num">04</span><h3 class="vt">3D Rendering</h3>
+            <div class="art"><div class="cube"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="body"><h3>3D Rendering</h3><p>Product and space visuals that feel real before they exist.</p><ul class="tags"><li>Product</li><li>Interior</li><li>Animation</li></ul></div>
           </article>
         </div>
+        <div class="meta"><span id="cnt">01 / 04</span><div class="bar"><i id="prog"></i></div><span>Scroll or hover</span></div>
       </div>
     </section>
 
@@ -558,121 +558,43 @@
     </section>
 
 
-    <!-- ================= CAPABILITIES & SERVICES SECTION ================= -->
+    <!-- ================= CAPABILITIES & SERVICES SECTION (SVG Path + Counters + Circle Reveal) ================= -->
     <section class="services-section" id="services" aria-label="Capabilities and Services">
-      <div class="services-container">
-        <!-- Left Column: Fixed 1:1 Preview Card with Animated ASCII Art -->
-        <div class="services-preview-col">
-          <div class="service-preview-card" id="service-preview-card">
-            <div class="ascii-preview-stage" id="ascii-preview-stage">
-              <!-- Symbol 1: Websites (Circle Wave Rings + Symbol 1) -->
-              <div class="s s1 is-active" id="ascii-s1">
-                <i class="ring circle" style="animation-delay:0s"></i>
-                <i class="ring circle" style="animation-delay:2.4s"></i>
-                <i class="ring circle" style="animation-delay:4.8s"></i>
-                <i class="ring circle" style="animation-delay:7.2s"></i>
-                <img class="sym inv" src="assets/services/ascii-s1.png" alt="Website ASCII Symbol" width="700" height="700" />
-              </div>
-
-              <!-- Symbol 2: Graphic Designing (Square Wave Rings + Symbol 2) -->
-              <div class="s s2" id="ascii-s2">
-                <i class="ring square" style="animation-delay:0s"></i>
-                <i class="ring square" style="animation-delay:2.4s"></i>
-                <i class="ring square" style="animation-delay:4.8s"></i>
-                <i class="ring square" style="animation-delay:7.2s"></i>
-                <img class="sym inv" src="assets/services/ascii-s2.png" alt="Graphic Designing ASCII Symbol" width="700" height="530" />
-              </div>
-
-              <!-- Symbol 3: Branding (Diamond Wave Rings + 3D Torus Donut ASCII) -->
-              <div class="s s3" id="ascii-s3">
-                <i class="ring diamond" style="animation-delay:0s"></i>
-                <i class="ring diamond" style="animation-delay:2.4s"></i>
-                <i class="ring diamond" style="animation-delay:4.8s"></i>
-                <i class="ring diamond" style="animation-delay:7.2s"></i>
-                <pre id="donut" class="sym abs" aria-label="abstract ASCII torus"></pre>
-              </div>
-
-              <!-- Symbol 4: 3D Rendering (Squircle Wave Rings + Symbol 4) -->
-              <div class="s s4" id="ascii-s4">
-                <i class="ring squircle" style="animation-delay:0s"></i>
-                <i class="ring squircle" style="animation-delay:2.4s"></i>
-                <i class="ring squircle" style="animation-delay:4.8s"></i>
-                <i class="ring squircle" style="animation-delay:7.2s"></i>
-                <img class="sym inv" src="assets/services/ascii-s4.png" alt="3D Rendering ASCII Symbol" width="700" height="700" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Column: Service Rows with Hairline Dividers -->
-        <div class="services-list-col" role="region" aria-label="Services list">
-          <div class="services-hairline-group">
-            <div 
-              class="service-row is-active" 
-              tabindex="0" 
-              role="button" 
-              aria-pressed="true" 
-              aria-label="Website service"
-              data-service="website" 
-              data-ascii="s1"
-              data-caption="Crafting immersive digital flagships that convert and inspire."
-            >
-              <div class="service-row-content">
-                <span class="service-row-title">Website</span>
-              </div>
-            </div>
-
-            <div 
-              class="service-row" 
-              tabindex="0" 
-              role="button" 
-              aria-pressed="false" 
-              aria-label="Graphic Designing service"
-              data-service="graphic-designing" 
-              data-ascii="s2"
-              data-caption="Visual communications and editorial art that command cultural attention."
-            >
-              <div class="service-row-content">
-                <span class="service-row-title">Graphic Designing</span>
-              </div>
-            </div>
-
-            <div 
-              class="service-row" 
-              tabindex="0" 
-              role="button" 
-              aria-pressed="false" 
-              aria-label="Branding service"
-              data-service="branding" 
-              data-ascii="s3"
-              data-caption="We create impactful brand identities that connect."
-            >
-              <div class="service-row-content">
-                <span class="service-row-title">Branding</span>
-              </div>
-            </div>
-
-            <div 
-              class="service-row" 
-              tabindex="0" 
-              role="button" 
-              aria-pressed="false" 
-              aria-label="3D Rendering service"
-              data-service="3d-rendering" 
-              data-ascii="s4"
-              data-caption="Photorealistic spatial visuals, product renders, and dimensional worlds."
-            >
-              <div class="service-row-content">
-                <span class="service-row-title">3D Rendering</span>
-              </div>
-            </div>
+      <!-- 1. SVG Path Draw with riding dot and discipline labels -->
+      <div class="pth">
+        <div class="stage">
+          <div class="box">
+            <svg viewBox="0 0 1000 800" preserveAspectRatio="none">
+              <path class="ghost" d="M120 40 C 880 90, 900 330, 520 400 C 140 470, 120 640, 500 690 C 700 715, 820 740, 860 780"/>
+              <path id="p" d="M120 40 C 880 90, 900 330, 520 400 C 140 470, 120 640, 500 690 C 700 715, 820 740, 860 780"/>
+            </svg>
+            <div class="dot"></div>
+            <div class="lab" style="left:12%;top:5%;margin:-1.9em 0 0 -.4em">Website</div>
+            <div class="lab" style="right:30%;top:25%">Branding</div>
+            <div class="lab" style="left:32%;top:60%">Graphic Designing</div>
+            <div class="lab" style="right:6%;top:85%">3D Rendering</div>
           </div>
         </div>
       </div>
+
+      <!-- 2. Dynamic Live Statistics with Theme-Flip -->
+      <div class="lt pad" id="lt">
+        <div class="mono">The background changes with you</div>
+        <div class="stats">
+          <div><b data-n="40">0</b><span>Projects shipped</span></div>
+          <div><b data-n="12">0</b><span>Brands launched</span></div>
+          <div><b data-n="100">0</b><span>Percent in-house</span></div>
+        </div>
+      </div>
+
+      <!-- 3. Circle Reveal Section Transition into Founders -->
+      <div class="cr" id="cr">
+        <div class="a"><h2>Every discipline, crafted with intent.</h2></div>
+        <div class="b"><h2>The people behind the work.</h2></div>
+      </div>
     </section>
 
-
-    <!-- ================= FOUNDERS SECTION ================= -->
+    <!-- ================= FOUNDERS SECTION (Revealed at end of Circle Reveal) ================= -->
     <section class="founders-section" id="founders" aria-label="The People Behind The Work">
       <div class="founders-full-wrapper reveal-item">
         <picture>
@@ -695,44 +617,26 @@
       </div>
     </section>
 
-    <!-- ================= 4D CREATIVE PROCESS SECTION ================= -->
-    <section class="process-section" id="process" aria-labelledby="process-heading">
-      <div class="process-container">
-        <!-- Section Header -->
-        <div class="process-header reveal-item">
-          <h2 id="process-heading" class="process-heading">CREATIVE PROCESS</h2>
+    <!-- ================= CREATIVE PROCESS (3D Drum + Morph + Seamless Flood) ================= -->
+    <section class="cp" id="process" aria-label="Creative Process">
+      <div class="lf">
+        <h2 id="cp-ttl">Creative Process</h2>
+        <div class="drum">
+          <div class="barrel" id="barrel">
+            <div class="face" style="--i:0"><div class="n">01</div><h3>Discover</h3><p>Understanding the idea, audience, and problem.</p></div>
+            <div class="face" style="--i:1"><div class="n">02</div><h3>Define</h3><p>Building the creative direction and visual strategy.</p></div>
+            <div class="face" style="--i:2"><div class="n">03</div><h3>Design</h3><p>Exploring concepts, typography, composition, and visual systems.</p></div>
+            <div class="face" style="--i:3"><div class="n">04</div><h3>Deliver</h3><p>Refining the final work and preparing it for real-world use.</p></div>
+          </div>
         </div>
-
-        <!-- 4D Process Cards Grid -->
-        <div class="process-grid reveal-item">
-          <!-- 01 DISCOVER -->
-          <article class="process-card" style="--step-idx: 0">
-            <span class="process-num">01</span>
-            <h3 class="process-step-title">DISCOVER</h3>
-            <p class="process-step-desc">Understanding the idea, audience, and problem.</p>
-          </article>
-
-          <!-- 02 DEFINE -->
-          <article class="process-card" style="--step-idx: 1">
-            <span class="process-num">02</span>
-            <h3 class="process-step-title">DEFINE</h3>
-            <p class="process-step-desc">Building the creative direction and visual strategy.</p>
-          </article>
-
-          <!-- 03 DESIGN -->
-          <article class="process-card" style="--step-idx: 2">
-            <span class="process-num">03</span>
-            <h3 class="process-step-title">DESIGN</h3>
-            <p class="process-step-desc">Exploring concepts, typography, composition, and visual systems.</p>
-          </article>
-
-          <!-- 04 DELIVER -->
-          <article class="process-card" style="--step-idx: 3">
-            <span class="process-num">04</span>
-            <h3 class="process-step-title">DELIVER</h3>
-            <p class="process-step-desc">Refining the final work and preparing it for real-world use.</p>
-          </article>
-        </div>
+        <div class="rail" id="rail"><span class="on">01 Discover</span><span>02 Define</span><span>03 Design</span><span>04 Deliver</span></div>
+      </div>
+      <div class="rt">
+        <svg class="shape" id="shape" viewBox="-100 -100 200 200" aria-hidden="true">
+          <circle class="ring" r="92"/>
+          <path id="blob" d=""/>
+          <circle class="orb" id="orb" r="3.2" cx="0" cy="-92"/>
+        </svg>
       </div>
     </section>
 

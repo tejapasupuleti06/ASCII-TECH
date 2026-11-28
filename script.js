@@ -682,37 +682,84 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --------------------------------------------------------------------------
-  // Core Disciplines: Interactive Card Hover & Selection
+  // Core Disciplines: Expanding Panels (Snippet 2)
   // --------------------------------------------------------------------------
-  const disciplinesGrid = document.querySelector('.disciplines-grid');
-  const disciplineCards = document.querySelectorAll('.discipline-card');
+  (function initCoreDisciplines() {
+    const panels = [...document.querySelectorAll('.cd .pn')];
+    if (!panels.length) return;
+    const cnt = document.getElementById('cnt');
+    const prog = document.getElementById('prog');
+    let cur = 0;
 
-  disciplineCards.forEach((card) => {
-    card.addEventListener('pointerenter', () => {
-      disciplineCards.forEach((c) => c.classList.remove('is-active'));
-      card.classList.add('is-active');
-      if (disciplinesGrid) disciplinesGrid.classList.add('has-active-card');
+    function setActive(i) {
+      cur = i;
+      panels.forEach((p, k) => {
+        const isOn = (k === i);
+        p.classList.toggle('on', isOn);
+        p.setAttribute('aria-expanded', isOn ? 'true' : 'false');
+      });
+      if (cnt) cnt.textContent = '0' + (i + 1) + ' / 04';
+      if (prog && typeof gsap !== 'undefined') {
+        gsap.to(prog, { scaleX: (i + 1) / 4, duration: 0.8, ease: 'expo.out' });
+      }
+    }
+
+    panels.forEach((p, i) => {
+      p.addEventListener('mouseenter', () => {
+        if (window.matchMedia('(hover:hover)').matches) setActive(i);
+      });
+      p.addEventListener('click', () => setActive(i));
+      p.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setActive(i);
+        }
+      });
     });
 
-    card.addEventListener('focus', () => {
-      disciplineCards.forEach((c) => c.classList.remove('is-active'));
-      card.classList.add('is-active');
-      if (disciplinesGrid) disciplinesGrid.classList.add('has-active-card');
-    });
+    if (!prefersReducedMotion && typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+      // Heading word rise
+      const ttl = document.getElementById('ttl');
+      if (ttl) {
+        ttl.innerHTML = ttl.textContent.split(' ').map(w => `<span class="w"><span class="wi">${w}</span></span>`).join(' ');
+        gsap.from('#ttl .wi', {
+          yPercent: 110,
+          duration: 1.2,
+          ease: 'expo.out',
+          stagger: 0.12,
+          scrollTrigger: { trigger: '.cd', start: 'top 75%', once: true }
+        });
+      }
 
-    card.addEventListener('click', () => {
-      disciplineCards.forEach((c) => c.classList.remove('is-active'));
-      card.classList.add('is-active');
-      if (disciplinesGrid) disciplinesGrid.classList.add('has-active-card');
-    });
-  });
+      // Panels rise in
+      gsap.from('.cd .pn', {
+        yPercent: 40,
+        opacity: 0,
+        duration: 1.2,
+        ease: 'expo.out',
+        stagger: 0.12,
+        scrollTrigger: { trigger: '.cd', start: 'top 70%', once: true }
+      });
 
-  if (disciplinesGrid) {
-    disciplinesGrid.addEventListener('pointerleave', () => {
-      disciplineCards.forEach((c) => c.classList.remove('is-active'));
-      disciplinesGrid.classList.remove('has-active-card');
-    });
-  }
+      // Desktop pinned scroll stepping through panels
+      if (window.matchMedia('(min-width: 861px)').matches) {
+        let last = 0;
+        ScrollTrigger.create({
+          trigger: '.cd',
+          start: 'top top',
+          end: '+=250%',
+          pin: true,
+          onUpdate(s) {
+            const i = Math.min(3, Math.floor(s.progress * 4));
+            if (i !== last) {
+              last = i;
+              setActive(i);
+            }
+          }
+        });
+      }
+    }
+  })();
 
   // --------------------------------------------------------------------------
   // Brand Identity Marks Accordion & In-Site PDF Viewer
@@ -1153,109 +1200,73 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // Capabilities & Services Section Interaction (Animated ASCII Symbols)
+  // Capabilities & Services: SVG Path + Counters + Circle Reveal (Snippet 1)
   // --------------------------------------------------------------------------
-  const serviceRows = document.querySelectorAll('.service-row');
-  const asciiSymbols = document.querySelectorAll('.ascii-preview-stage .s');
+  (function initServicesAndReveal() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
-  if (serviceRows.length) {
-    const activateService = (row) => {
-      if (row.classList.contains('is-active')) return;
+    // 1. SVG line draws itself, a dot rides along it, labels pop in on the way
+    const p = document.getElementById('p');
+    if (p) {
+      const len = p.getTotalLength ? p.getTotalLength() : 1800;
+      gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+      const dot = document.querySelector('.pth .dot');
+      const labs = gsap.utils.toArray('.pth .lab');
+      const marks = [0.02, 0.28, 0.5, 0.97];
 
-      serviceRows.forEach((r) => {
-        r.classList.remove('is-active');
-        r.setAttribute('aria-pressed', 'false');
-      });
-
-      row.classList.add('is-active');
-      row.setAttribute('aria-pressed', 'true');
-
-      const asciiId = row.getAttribute('data-ascii') || 's1';
-
-      // Switch active ASCII Symbol block
-      asciiSymbols.forEach((s) => {
-        s.classList.remove('is-active');
-      });
-      const activeSymbol = document.getElementById(`ascii-${asciiId}`);
-      if (activeSymbol) {
-        activeSymbol.classList.add('is-active');
-      }
-    };
-
-    serviceRows.forEach((row) => {
-      row.addEventListener('mouseenter', () => activateService(row));
-      row.addEventListener('focus', () => activateService(row));
-      row.addEventListener('click', () => activateService(row));
-      row.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          activateService(row);
-        }
-      });
-    });
-  }
-
-  // --------------------------------------------------------------------------
-  // ASCII Donut Animation for Branding Service
-  // --------------------------------------------------------------------------
-  (function initAsciiDonut() {
-    const el = document.getElementById('donut');
-    if (!el) return;
-    const W = 64, H = 28, ch = '.,-~:;=!*#$@';
-    let A = 0, B = 0, lastDonutT = 0;
-
-    function renderDonutFrame() {
-      const b = new Array(W * H).fill(' ');
-      const z = new Array(W * H).fill(0);
-      const s = Math.sin, c0 = Math.cos;
-      for (let j = 0; j < 6.28; j += 0.08) {
-        for (let i = 0; i < 6.28; i += 0.035) {
-          const c = s(i), d = c0(j), e = s(A), f = s(j), g = c0(A), h = d + 2,
-                D = 1 / (c * h * e + f * g + 5), l = c0(i), m = c0(B), n = s(B), t = c * h * g - f * e,
-                x = 0 | (W / 2 + 34 * D * (l * h * m - t * n)),
-                y = 0 | (H / 2 + 16 * D * (l * h * n + t * m)),
-                o = x + W * y,
-                N = 0 | (8 * ((f * e - c * d * g) * m - c * d * e - f * g - l * d * n));
-          if (y >= 0 && y < H && x >= 0 && x < W && D > z[o]) {
-            z[o] = D;
-            b[o] = ch[N > 0 ? N : 0];
+      ScrollTrigger.create({
+        trigger: '.pth',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+        onUpdate(s) {
+          const pr = s.progress;
+          gsap.set(p, { strokeDashoffset: len * (1 - pr) });
+          if (p.getPointAtLength) {
+            const pt = p.getPointAtLength(len * pr);
+            if (dot) {
+              dot.style.left = (pt.x / 10) + '%';
+              dot.style.top = (pt.y / 8) + '%';
+            }
           }
+          labs.forEach((l, i) => {
+            const on = pr > marks[i];
+            gsap.to(l, { opacity: on ? 1 : 0, y: on ? 0 : 20, duration: 0.4, overwrite: true });
+          });
         }
-      }
-      let out = '';
-      for (let k = 0; k < W * H; k++) {
-        out += b[k];
-        if (k % W === W - 1) out += '\n';
-      }
-      el.textContent = out;
-      A += 0.04;
-      B += 0.025;
+      });
     }
 
-    renderDonutFrame();
+    // 2. Dynamic live statistics counters with theme-flip
+    document.querySelectorAll('.lt [data-n]').forEach((el) => {
+      const targetVal = +el.dataset.n;
+      const o = { v: 0 };
+      gsap.to(o, {
+        v: targetVal,
+        duration: 2,
+        ease: 'power2.out',
+        onUpdate: () => {
+          el.textContent = Math.round(o.v) + (el.dataset.n === '100' ? '%' : '+');
+        },
+        scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+      });
+    });
 
-    if (!prefersReducedMotion) {
-      let isDonutVisible = false;
-      const servicesSection = document.getElementById('services');
-      if ('IntersectionObserver' in window && servicesSection) {
-        const donutObserver = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            isDonutVisible = entry.isIntersecting;
-          });
-        }, { threshold: 0.05 });
-        donutObserver.observe(servicesSection);
-      } else {
-        isDonutVisible = true;
-      }
-
-      function donutLoop(t) {
-        if (isDonutVisible && (t - lastDonutT > 40)) {
-          renderDonutFrame();
-          lastDonutT = t;
+    // 3. Circle reveal section transition directly into Founders section
+    const cr = document.getElementById('cr');
+    if (cr) {
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: '.cr',
+          start: 'top top',
+          end: '+=120%',
+          pin: true,
+          scrub: 0.6
         }
-        requestAnimationFrame(donutLoop);
-      }
-      requestAnimationFrame(donutLoop);
+      })
+        .to('.cr .a h2', { scale: 0.85, opacity: 0.3, ease: 'none' }, 0)
+        .to('.cr .b', { clipPath: 'circle(85% at 50% 60%)', ease: 'none' }, 0)
+        .from('.cr .b h2', { yPercent: 40, opacity: 0, ease: 'power2.out' }, 0.3);
     }
   })();
 
@@ -1424,33 +1435,100 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // Creative Process Section Scroll Reveal
+  // Creative Process: 3D Drum + Morph + Seamless Flood into Footer (Snippet 3)
   // --------------------------------------------------------------------------
-  const processSection = document.getElementById('process');
-  if (processSection) {
-    if (prefersReducedMotion) {
-      processSection.classList.add('is-revealed');
-    } else if ('IntersectionObserver' in window) {
-      const processRevealObserver = new IntersectionObserver(
-        (entries, observer) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              processSection.classList.add('is-revealed');
-              observer.unobserve(entry.target);
-            }
-          });
-        },
-        {
-          root: null,
-          threshold: 0.05,
-          rootMargin: '0px 0px -30px 0px'
-        }
-      );
-      processRevealObserver.observe(processSection);
-    } else {
-      processSection.classList.add('is-revealed');
+  (function initCreativeProcess() {
+    const cpSection = document.getElementById('process');
+    if (!cpSection || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+
+    /* ---- Shape morph: four polar radius profiles, blended by scroll ---- */
+    const N = 140, TAU = Math.PI * 2;
+    const mod = (x, m) => ((x % m) + m) % m;
+    const profiles = [
+      th => 62,                                                                              // Discover: circle
+      th => 62 / Math.pow(Math.pow(Math.abs(Math.cos(th)), 4) + Math.pow(Math.abs(Math.sin(th)), 4), 0.25), // Define: squircle
+      th => 58 + 16 * Math.cos(5 * th),                                                      // Design: flower
+      th => { const f = mod(th + Math.PI / 2, TAU / 3); return 0.85 * 34 / Math.cos(f - Math.PI / 3) + 0.15 * 58; } // Deliver: triangle
+    ];
+    const radii = profiles.map(fn => Array.from({ length: N }, (_, k) => fn((k / N) * TAU)));
+    const blob = document.getElementById('blob');
+    const ease = t => t * t * (3 - 2 * t);
+
+    function drawShape(s) {
+      if (!blob) return;
+      const i = Math.min(2, Math.floor(s)), f = ease(Math.min(1, s - i));
+      let d = '';
+      for (let k = 0; k < N; k++) {
+        const th = (k / N) * TAU, r = radii[i][k] + (radii[i + 1][k] - radii[i][k]) * f;
+        d += (k ? 'L' : 'M') + (r * Math.cos(th)).toFixed(2) + ' ' + (r * Math.sin(th)).toFixed(2);
+      }
+      blob.setAttribute('d', d + 'Z');
     }
-  }
+
+    const cpFaces = [...document.querySelectorAll('.cp .face')];
+    const cpRail = [...document.querySelectorAll('#rail span')];
+    const barrel = document.getElementById('barrel');
+    const shape = document.getElementById('shape');
+    const orb = document.getElementById('orb');
+    const colA = '#FF8C1A', colB = '#0c0b0a';
+    let lastIdx = -1;
+
+    function updateProcess(p) {
+      const s = Math.min(3, (p / 0.8) * 3);
+      drawShape(s);
+      if (barrel) gsap.set(barrel, { rotateX: -s * 90 });
+      cpFaces.forEach((f, i) => f.style.opacity = Math.max(0, 1 - Math.abs(i - s) * 0.9));
+      const idx = Math.round(s);
+      if (idx !== lastIdx) {
+        lastIdx = idx;
+        cpRail.forEach((r, k) => r.classList.toggle('on', k === idx));
+      }
+      const a = p * Math.PI * 4;
+      if (orb) {
+        orb.setAttribute('cx', (92 * Math.sin(a)).toFixed(2));
+        orb.setAttribute('cy', (-92 * Math.cos(a)).toFixed(2));
+      }
+      /* Flood: shape smoothly expands and interpolates into #0c0b0a directly connecting into dark footer */
+      const q = Math.max(0, (p - 0.78) / 0.22);
+      if (shape) gsap.set(shape, { rotate: s * 40 + q * 90, scale: 1 + Math.pow(q, 3) * 26 });
+      if (blob) blob.style.fill = q > 0 ? gsap.utils.interpolate(colA, colB, Math.min(1, Math.max(0, (q - 0.5) / 0.5))) : '';
+      gsap.set('.cp .lf', { opacity: 1 - Math.min(1, q * 2.2) });
+    }
+
+    if (prefersReducedMotion) {
+      updateProcess(0);
+    } else {
+      updateProcess(0);
+
+      // Entrance animation
+      const cpTtl = document.getElementById('cp-ttl');
+      if (cpTtl) {
+        cpTtl.innerHTML = [...cpTtl.textContent].map(c => c === ' ' ? ' ' : `<span class="c">${c}</span>`).join('');
+        const once = { trigger: '#process', start: 'top 75%', once: true };
+        gsap.from('#cp-ttl .c', { yPercent: 120, rotate: () => gsap.utils.random(-25, 25), opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.03, scrollTrigger: once });
+        gsap.from('.cp .drum', { y: 90, rotateX: 55, opacity: 0, duration: 1.3, ease: 'expo.out', scrollTrigger: once });
+        gsap.from('#rail span', { y: 16, opacity: 0, duration: 0.8, ease: 'expo.out', stagger: 0.08, delay: 0.3, scrollTrigger: once });
+        gsap.from('.cp .rt', { scale: 0.3, opacity: 0, duration: 1.4, ease: 'elastic.out(1,.6)', scrollTrigger: once });
+      }
+
+      // Pinned scroll driving drum rotation, shape morph, and seamless flood directly into footer
+      ScrollTrigger.create({
+        trigger: '#process',
+        start: 'top top',
+        end: '+=240%',
+        pin: true,
+        snap: {
+          snapTo: [0, 0.2667, 0.5333, 0.8, 1],
+          delay: 0.08,
+          duration: { min: 0.3, max: 0.6 },
+          ease: 'power2.inOut',
+          directional: false,
+          inertia: false
+        },
+        onUpdate: s => updateProcess(s.progress)
+      });
+    }
+  })();
 
   // --------------------------------------------------------------------------
   // Footer Section Scroll Reveal & Staggered Column Entrance
