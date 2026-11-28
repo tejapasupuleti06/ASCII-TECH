@@ -2966,28 +2966,39 @@ body.pdf-modal-open {
 .services-section {
   position: relative;
   z-index: 20;
-  background-color: #1c1c1e;
-  color: #f2f2ef;
   width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  --services-bg: #1c1c1e;
+  --services-hero-text: #ffffff;
+  --services-shadow-alpha: 0.6;
+  --services-ghost-alpha: 0.12;
+  --services-stats-text: #0c0b0a;
+  --services-stats-muted: #646464;
+  background-color: var(--services-bg, #1c1c1e);
+  color: var(--services-hero-text, #ffffff);
   padding: 0;
-  overflow: visible;
 }
 
 /* 1. SVG Path Draw */
 .pth {
-  position: relative;
-  height: 240vh;
+  position: absolute;
+  inset: 0;
   width: 100%;
+  height: 100%;
+  will-change: transform;
+  pointer-events: none;
 }
 
 .pth .stage {
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
   display: grid;
   place-items: center;
   overflow: hidden;
-  width: 100%;
 }
 
 .pth .box {
@@ -3012,7 +3023,7 @@ body.pdf-modal-open {
 }
 
 .pth .ghost {
-  stroke: rgba(255, 255, 255, 0.12);
+  stroke: rgba(255, 255, 255, var(--services-ghost-alpha, 0.12));
 }
 
 .pth .dot {
@@ -3031,27 +3042,38 @@ body.pdf-modal-open {
 .pth .lab {
   position: absolute;
   font-family: var(--font-display);
-  font-size: clamp(22px, 3.4vw, 44px);
+  font-size: clamp(20px, 3.4vw, 44px);
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #ffffff;
+  color: var(--services-hero-text, #ffffff);
   opacity: 0;
   transform: translateY(20px);
   pointer-events: none;
-  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 4px 18px rgba(0, 0, 0, var(--services-shadow-alpha, 0.6));
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .pth .lab {
+    font-size: clamp(16px, 4.8vw, 24px);
+  }
 }
 
 /* 2. Light Section with Live Counters */
 .lt {
-  min-height: 85vh;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: var(--color-primary); /* #E5E5E5 */
-  color: #0c0b0a;
+  background: transparent !important;
+  color: var(--services-stats-text, #0c0b0a);
   padding: 12vh 6vw;
-  width: 100%;
   box-sizing: border-box;
+  will-change: transform;
+  transform: translateY(100%);
 }
 
 .lt.pad {
@@ -3080,7 +3102,7 @@ body.pdf-modal-open {
   font-size: clamp(48px, 8.5vw, 130px);
   letter-spacing: -0.04em;
   line-height: 1;
-  color: #0c0b0a;
+  color: var(--services-stats-text, #0c0b0a);
   font-weight: 800;
 }
 
@@ -3088,7 +3110,7 @@ body.pdf-modal-open {
   display: block;
   font-family: var(--font-display);
   font-size: clamp(14px, 1.2vw, 18px);
-  color: #646464;
+  color: var(--services-stats-muted, #646464);
   margin-top: 10px;
   letter-spacing: -0.01em;
 }
