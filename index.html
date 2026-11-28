@@ -558,30 +558,33 @@
 
     <!-- ================= CAPABILITIES & SERVICES SECTION (SVG Path + Counters + Circle Reveal) ================= -->
     <section class="services-section" id="services" aria-label="Capabilities and Services">
-      <!-- 1. SVG Path Draw with riding dot and discipline labels -->
-      <div class="pth">
-        <div class="stage">
-          <div class="box">
-            <svg viewBox="0 0 1000 800" preserveAspectRatio="none">
-              <path class="ghost" d="M120 40 C 880 90, 900 330, 520 400 C 140 470, 120 640, 500 690 C 700 715, 820 740, 860 780"/>
-              <path id="p" d="M120 40 C 880 90, 900 330, 520 400 C 140 470, 120 640, 500 690 C 700 715, 820 740, 860 780"/>
-            </svg>
-            <div class="dot"></div>
-            <div class="lab" style="left:12%;top:5%;margin:-1.9em 0 0 -.4em">Website</div>
-            <div class="lab" style="right:30%;top:25%">Branding</div>
-            <div class="lab" style="left:32%;top:60%">Graphic Designing</div>
-            <div class="lab" style="right:6%;top:85%">3D Rendering</div>
+      <!-- Pinned Transition Stage: Path Draw + Dark-to-Light Cross-Fade + Live Stats -->
+      <div class="services-stage" id="services-stage">
+        <!-- 1. SVG Path Draw with riding dot and discipline labels -->
+        <div class="pth">
+          <div class="stage">
+            <div class="box">
+              <svg viewBox="0 0 1000 800" preserveAspectRatio="none">
+                <path class="ghost" d="M120 40 C 880 90, 900 330, 520 400 C 140 470, 120 640, 500 690 C 700 715, 820 740, 860 780"/>
+                <path id="p" d="M120 40 C 880 90, 900 330, 520 400 C 140 470, 120 640, 500 690 C 700 715, 820 740, 860 780"/>
+              </svg>
+              <div class="dot"></div>
+              <div class="lab" style="left:12%;top:5%;margin:-1.9em 0 0 -.4em">Website</div>
+              <div class="lab" style="right:30%;top:25%">Branding</div>
+              <div class="lab" style="left:32%;top:60%">Graphic Designing</div>
+              <div class="lab" style="right:6%;top:85%">3D Rendering</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- 2. Dynamic Live Statistics with Theme-Flip -->
-      <div class="lt pad" id="lt">
-        <div class="mono">The background changes with you</div>
-        <div class="stats">
-          <div><b data-n="40">0</b><span>Projects shipped</span></div>
-          <div><b data-n="12">0</b><span>Brands launched</span></div>
-          <div><b data-n="100">0</b><span>Percent in-house</span></div>
+        <!-- 2. Dynamic Live Statistics with Theme-Flip -->
+        <div class="lt pad" id="lt">
+          <div class="mono">The background changes with you</div>
+          <div class="stats">
+            <div><b data-n="40">0</b><span>Projects shipped</span></div>
+            <div><b data-n="12">0</b><span>Brands launched</span></div>
+            <div><b data-n="100">0</b><span>Percent in-house</span></div>
+          </div>
         </div>
       </div>
 

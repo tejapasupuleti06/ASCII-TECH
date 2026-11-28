@@ -2966,6 +2966,16 @@ body.pdf-modal-open {
 .services-section {
   position: relative;
   z-index: 20;
+  background-color: #1c1c1e;
+  color: #f2f2ef;
+  width: 100%;
+  padding: 0;
+  overflow: visible;
+}
+
+/* Stage for Curve + Stats transition */
+.services-stage {
+  position: relative;
   width: 100%;
   height: 100vh;
   height: 100svh;
@@ -2978,7 +2988,7 @@ body.pdf-modal-open {
   --services-stats-muted: #646464;
   background-color: var(--services-bg, #1c1c1e);
   color: var(--services-hero-text, #ffffff);
-  padding: 0;
+  box-sizing: border-box;
 }
 
 /* 1. SVG Path Draw */
@@ -3073,7 +3083,7 @@ body.pdf-modal-open {
   padding: 12vh 6vw;
   box-sizing: border-box;
   will-change: transform;
-  transform: translateY(100%);
+  transform: translate3d(0, 100%, 0);
 }
 
 .lt.pad {
@@ -3118,6 +3128,7 @@ body.pdf-modal-open {
 /* 3. Circle Reveal Section Transition seamlessly revealing Founders */
 .cr {
   height: 100vh;
+  height: 100svh;
   position: relative;
   overflow: hidden;
   width: 100%;
@@ -3155,6 +3166,7 @@ body.pdf-modal-open {
   background: var(--color-accent);
   color: #ffffff;
   clip-path: circle(0% at 50% 50%);
+  -webkit-clip-path: circle(0% at 50% 50%);
   z-index: 2;
   display: flex;
   flex-direction: column;

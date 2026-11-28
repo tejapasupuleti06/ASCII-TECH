@@ -1192,7 +1192,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const still = prefersReducedMotion;
-    const servicesEl = document.getElementById('services');
+    const servicesStage = document.getElementById('services-stage');
     const p = document.getElementById('p');
     const dot = document.querySelector('.pth .dot');
     const labs = gsap.utils.toArray('.pth .lab');
@@ -1202,8 +1202,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const len = p && p.getTotalLength ? p.getTotalLength() : 1800;
 
     // Easy tuning knobs:
-    // DRAW_END: Where the path finishes drawing (e.g. 0.60 = 60% of scroll)
-    // FADE_DURATION: How long the color blend and movement lasts (e.g. 0.28 = 28% of scroll)
+    // DRAW_END: Where the path finishes drawing (0.60 = 60% of scroll)
+    // FADE_DURATION: How long the color blend and movement lasts (0.28 = 28% of scroll, 60% to 88%)
     const DRAW_END = 0.60;
     const FADE_DURATION = 0.28;
 
@@ -1235,21 +1235,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (still) {
       if (p) gsap.set(p, { strokeDasharray: 'none', strokeDashoffset: 0 });
       labs.forEach((l) => gsap.set(l, { opacity: 1, y: 0 }));
-      if (servicesEl) {
-        servicesEl.style.setProperty('--services-bg', '#E5E5E5');
-        servicesEl.style.setProperty('--services-hero-text', '#0c0b0a');
-        servicesEl.style.setProperty('--services-shadow-alpha', '0');
-        servicesEl.style.setProperty('--services-ghost-alpha', '0');
+      if (servicesStage) {
+        servicesStage.style.setProperty('--services-bg', '#E5E5E5');
+        servicesStage.style.setProperty('--services-hero-text', '#0c0b0a');
+        servicesStage.style.setProperty('--services-shadow-alpha', '0');
+        servicesStage.style.setProperty('--services-ghost-alpha', '0');
       }
       if (pthEl) pthEl.style.transform = 'translate3d(0, -100%, 0)';
       if (ltEl) ltEl.style.transform = 'translate3d(0, 0, 0)';
       animateCounters();
-    } else if (servicesEl && p) {
+    } else if (servicesStage && p) {
       gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
 
       ScrollTrigger.create({
         id: 'servicesTransition',
-        trigger: '#services',
+        trigger: '#services-stage',
         start: 'top top',
         end: '+=220%',
         pin: true,
@@ -1257,7 +1257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         onUpdate(s) {
           const pr = s.progress;
 
-          // 1. Draw SVG path and travel dot (0.00 to DRAW_END)
+          // 1. Draw SVG path and travel dot (0.00 to DRAW_END = 0.60)
           const pathPr = clampVal(pr / DRAW_END);
           gsap.set(p, { strokeDashoffset: len * (1 - pathPr) });
           if (p.getPointAtLength) {
@@ -1274,10 +1274,10 @@ document.addEventListener('DOMContentLoaded', () => {
             gsap.to(l, { opacity: on ? 1 : 0, y: on ? 0 : 20, duration: 0.3, overwrite: true });
           });
 
-          // 2. Smooth color blend & upward drift (DRAW_END to DRAW_END + FADE_DURATION)
+          // 2. Smooth color blend & upward drift (0.60 to 0.88)
           const t = clampVal((pr - DRAW_END) / FADE_DURATION);
 
-          // Hero curve drifts upward slowly, stats section rises into view from below
+          // Hero curve drifts upward naturally, stats section rises from below
           if (pthEl) {
             pthEl.style.transform = `translate3d(0, ${-100 * t}%, 0)`;
           }
@@ -1285,27 +1285,25 @@ document.addEventListener('DOMContentLoaded', () => {
             ltEl.style.transform = `translate3d(0, ${100 * (1 - t)}%, 0)`;
           }
 
-          // Continuous background color blend:
-          // dark #1c1c1e (28, 28, 30) -> light #E5E5E5 (229, 229, 229)
+          // Background cross-fades from dark #1c1c1e (28, 28, 30) to light #E5E5E5 (229, 229, 229)
           const bgR = Math.round(28 + t * (229 - 28));
           const bgG = Math.round(28 + t * (229 - 28));
           const bgB = Math.round(30 + t * (229 - 30));
 
-          // Label text color: white #ffffff (255, 255, 255) -> dark #0c0b0a (12, 11, 10)
+          // Label text color: #ffffff (255, 255, 255) -> #0c0b0a (12, 11, 10)
           const heroR = Math.round(255 - t * (255 - 12));
           const heroG = Math.round(255 - t * (255 - 11));
           const heroB = Math.round(255 - t * (255 - 10));
 
-          // Text shadow and ghost line fade out as the background lightens
           const shadowA = (0.6 * (1 - t)).toFixed(2);
           const ghostA = (0.12 * (1 - t)).toFixed(2);
 
-          servicesEl.style.setProperty('--services-bg', `rgb(${bgR}, ${bgG}, ${bgB})`);
-          servicesEl.style.setProperty('--services-hero-text', `rgb(${heroR}, ${heroG}, ${heroB})`);
-          servicesEl.style.setProperty('--services-shadow-alpha', shadowA);
-          servicesEl.style.setProperty('--services-ghost-alpha', ghostA);
+          servicesStage.style.setProperty('--services-bg', `rgb(${bgR}, ${bgG}, ${bgB})`);
+          servicesStage.style.setProperty('--services-hero-text', `rgb(${heroR}, ${heroG}, ${heroB})`);
+          servicesStage.style.setProperty('--services-shadow-alpha', shadowA);
+          servicesStage.style.setProperty('--services-ghost-alpha', ghostA);
 
-          // 3. Trigger live statistics counter animation once stats enter view
+          // 3. Stats section rests comfortably while numbers animate (88% to 100%)
           if (t >= 0.45 && !countersAnimated) {
             countersAnimated = true;
             animateCounters();
@@ -1320,21 +1318,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Circle reveal section transition seamlessly revealing Founders
     const cr = document.getElementById('cr');
     if (cr) {
-      const crTl = gsap.timeline({
-        scrollTrigger: {
-          trigger: '.cr',
-          start: 'top top',
-          end: '+=100%',
-          pin: true,
-          scrub: 0.6
-        }
-      });
+      if (prefersReducedMotion) {
+        gsap.set('.cr .b', { clipPath: 'circle(150% at 50% 50%)', webkitClipPath: 'circle(150% at 50% 50%)' });
+        gsap.set('.cr-founders-title', { opacity: 1, y: 0 });
+        gsap.set('.cr .team-card', { opacity: 1, y: 0 });
+      } else {
+        const crTl = gsap.timeline({
+          scrollTrigger: {
+            trigger: '.cr',
+            start: 'top top',
+            end: '+=100%',
+            pin: true,
+            scrub: 0.6
+          }
+        });
 
-      crTl
-        .to('.cr .a h2', { scale: 0.88, opacity: 0.2, ease: 'none' }, 0)
-        .to('.cr .b', { clipPath: 'circle(150% at 50% 50%)', ease: 'none' }, 0)
-        .from('.cr-founders-title', { y: 25, opacity: 0, duration: 0.4, ease: 'power2.out' }, 0.2)
-        .from('.cr .team-card', { y: 40, opacity: 0, stagger: 0.1, duration: 0.5, ease: 'power2.out' }, 0.3);
+        crTl
+          .to('.cr .a h2', { scale: 0.88, opacity: 0.2, ease: 'none' }, 0)
+          .to('.cr .b', { clipPath: 'circle(150% at 50% 50%)', webkitClipPath: 'circle(150% at 50% 50%)', ease: 'none' }, 0)
+          .from('.cr-founders-title', { y: 25, opacity: 0, duration: 0.4, ease: 'power2.out' }, 0.2)
+          .from('.cr .team-card', { y: 40, opacity: 0, stagger: 0.1, duration: 0.5, ease: 'power2.out' }, 0.3);
+      }
     }
   })();
 
