@@ -874,7 +874,7 @@ body.menu-open .menu-toggle[aria-expanded="true"] .line-bot {
 .cd h2 {
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(38px, 6vw, 92px);
+  font-size: clamp(32px, 5.1vw, 78px);
   letter-spacing: -0.025em;
   line-height: 1.05;
   color: #646464;
@@ -3121,52 +3121,117 @@ body.pdf-modal-open {
 }
 
 /* ==========================================================================
-   Founders Section: "THE PEOPLE BEHIND THE WORK"
-   Direct High-Quality Photo Presentation Matching Exact Reference
+   Founders / Team Section (Snippet 1 Layout)
    ========================================================================== */
 
-.founders-section {
+.team {
   position: relative;
-  width: 100%;
-  background: linear-gradient(to bottom, #242528 0%, #242528 37.02%, #ffffff 37.02%, #ffffff 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 0;
+  background: #1c1c1e;
+  color: #f2f2ef;
+  aspect-ratio: 1.6;
+  min-height: 560px;
   overflow: hidden;
   z-index: 20;
 }
 
-.founders-full-wrapper {
-  position: relative;
-  width: 100%;
-  max-width: 1440px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.team::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 25.7%;
+  background: var(--color-accent);
 }
 
-.founders-full-photo {
-  width: 100%;
-  height: auto;
-  aspect-ratio: 1024 / 832;
+.team figure {
+  position: absolute;
+  margin: 0;
+}
+
+.team .t {
+  left: 14.375%;
+  top: 7.6%;
+  width: 28.75%;
+}
+
+.team .l {
+  left: 58.125%;
+  top: 19.6%;
+  width: 31.25%;
+}
+
+.team img {
   display: block;
-  object-fit: contain;
-  image-rendering: -webkit-optimize-contrast;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 4px;
 }
 
-/* Scroll reveal integration */
-.founders-section .reveal-item {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
-  will-change: opacity, transform;
+.team .t img {
+  aspect-ratio: 1 / 1;
+  object-position: 50% 38%;
 }
 
-.founders-section.is-revealed .reveal-item {
-  opacity: 1;
-  transform: translateY(0);
+.team .l img {
+  aspect-ratio: 500 / 680;
+  object-position: 50% 40%;
+}
+
+.team figcaption {
+  margin-top: 2.2%;
+}
+
+.team h3 {
+  font-family: var(--font-display);
+  font-size: clamp(20px, 1.9vw, 32px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  color: #f2f2ef;
+  margin: 0;
+}
+
+.team p {
+  font-family: var(--font-sans);
+  font-size: clamp(16px, 1.6vw, 26px);
+  margin-top: 0.4em;
+  color: #8a8a90;
+  margin-bottom: 0;
+}
+
+@media (max-width: 700px) {
+  .team {
+    aspect-ratio: auto;
+    min-height: 0;
+    padding: 12vw 8vw 14vw;
+    display: flex;
+    flex-direction: column;
+    gap: 12vw;
+  }
+  .team::before {
+    height: 62vw;
+  }
+  .team figure {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 100%;
+  }
+  .team .l {
+    width: 88%;
+    align-self: flex-end;
+  }
+  .team .t {
+    width: 88%;
+  }
+  .team h3 {
+    font-size: 22px;
+  }
+  .team p {
+    font-size: 17px;
+  }
 }
 
 /* ==========================================================================
@@ -3200,11 +3265,12 @@ body.pdf-modal-open {
 .lf h2 {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(38px, 5.8vw, 92px);
+  font-size: clamp(26px, 4.2vw, 68px);
   letter-spacing: -0.03em;
   line-height: 1;
   text-transform: uppercase;
   color: #0c0b0a;
+  white-space: nowrap;
 }
 
 .lf h2 .c {

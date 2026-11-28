@@ -1268,6 +1268,23 @@ document.addEventListener('DOMContentLoaded', () => {
         .to('.cr .b', { clipPath: 'circle(85% at 50% 60%)', ease: 'none' }, 0)
         .from('.cr .b h2', { yPercent: 40, opacity: 0, ease: 'power2.out' }, 0.3);
     }
+
+    // 4. Founders slide in after the circle reveal (Snippet 1)
+    gsap.from('.team .t', {
+      y: 70,
+      opacity: 0,
+      duration: 1,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: '.team', start: 'top 70%', once: true }
+    });
+    gsap.from('.team .l', {
+      y: 120,
+      opacity: 0,
+      duration: 1.2,
+      delay: 0.15,
+      ease: 'power3.out',
+      scrollTrigger: { trigger: '.team', start: 'top 70%', once: true }
+    });
   })();
 
   // --------------------------------------------------------------------------
@@ -1466,32 +1483,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const cpFaces = [...document.querySelectorAll('.cp .face')];
-    const cpRail = [...document.querySelectorAll('#rail span')];
     const barrel = document.getElementById('barrel');
     const shape = document.getElementById('shape');
     const orb = document.getElementById('orb');
     const colA = '#FF8C1A', colB = '#0c0b0a';
-    let lastIdx = -1;
 
     function updateProcess(p) {
-      const s = Math.min(3, (p / 0.8) * 3);
+      const s = Math.min(3, (p / 0.78) * 3);
       drawShape(s);
       if (barrel) gsap.set(barrel, { rotateX: -s * 90 });
       cpFaces.forEach((f, i) => f.style.opacity = Math.max(0, 1 - Math.abs(i - s) * 0.9));
-      const idx = Math.round(s);
-      if (idx !== lastIdx) {
-        lastIdx = idx;
-        cpRail.forEach((r, k) => r.classList.toggle('on', k === idx));
-      }
+      
       const a = p * Math.PI * 4;
       if (orb) {
         orb.setAttribute('cx', (92 * Math.sin(a)).toFixed(2));
         orb.setAttribute('cy', (-92 * Math.cos(a)).toFixed(2));
       }
       /* Flood: shape smoothly expands and interpolates into #0c0b0a directly connecting into dark footer */
-      const q = Math.max(0, (p - 0.78) / 0.22);
+      const q = Math.max(0, (p - 0.72) / 0.28);
       if (shape) gsap.set(shape, { rotate: s * 40 + q * 90, scale: 1 + Math.pow(q, 3) * 26 });
-      if (blob) blob.style.fill = q > 0 ? gsap.utils.interpolate(colA, colB, Math.min(1, Math.max(0, (q - 0.5) / 0.5))) : '';
+      if (blob) blob.style.fill = q > 0 ? gsap.utils.interpolate(colA, colB, Math.min(1, Math.max(0, (q - 0.4) / 0.6))) : '';
       gsap.set('.cp .lf', { opacity: 1 - Math.min(1, q * 2.2) });
     }
 
@@ -1507,24 +1518,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const once = { trigger: '#process', start: 'top 75%', once: true };
         gsap.from('#cp-ttl .c', { yPercent: 120, rotate: () => gsap.utils.random(-25, 25), opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.03, scrollTrigger: once });
         gsap.from('.cp .drum', { y: 90, rotateX: 55, opacity: 0, duration: 1.3, ease: 'expo.out', scrollTrigger: once });
-        gsap.from('#rail span', { y: 16, opacity: 0, duration: 0.8, ease: 'expo.out', stagger: 0.08, delay: 0.3, scrollTrigger: once });
         gsap.from('.cp .rt', { scale: 0.3, opacity: 0, duration: 1.4, ease: 'elastic.out(1,.6)', scrollTrigger: once });
       }
 
-      // Pinned scroll driving drum rotation, shape morph, and seamless flood directly into footer
+      // Single pinned scroll (100vh) - after this scroll, Let's talk and footer appear immediately
       ScrollTrigger.create({
         trigger: '#process',
         start: 'top top',
-        end: '+=240%',
+        end: '+=100%',
         pin: true,
-        snap: {
-          snapTo: [0, 0.2667, 0.5333, 0.8, 1],
-          delay: 0.08,
-          duration: { min: 0.3, max: 0.6 },
-          ease: 'power2.inOut',
-          directional: false,
-          inertia: false
-        },
+        scrub: 0.5,
         onUpdate: s => updateProcess(s.progress)
       });
     }
