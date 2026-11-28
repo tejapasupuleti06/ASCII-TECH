@@ -1187,60 +1187,41 @@ document.addEventListener('DOMContentLoaded', () => {
   (function initServicesAndReveal() {
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
 
-    if (typeof ScrollTrigger !== 'undefined') {
-      ScrollTrigger.config({ ignoreMobileResize: true });
-    }
-
-    const still = prefersReducedMotion;
-
     // 1. SVG line draws itself, a dot rides along it, labels pop in on the way
     const p = document.getElementById('p');
     if (p) {
       const len = p.getTotalLength ? p.getTotalLength() : 1800;
+      gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
       const dot = document.querySelector('.pth .dot');
       const labs = gsap.utils.toArray('.pth .lab');
-      const marks = [0.03, 0.28, 0.52, 0.82];
+      const marks = [0.02, 0.28, 0.5, 0.97];
 
-      if (still) {
-        gsap.set(p, { strokeDasharray: 'none', strokeDashoffset: 0 });
-        labs.forEach((l) => gsap.set(l, { opacity: 1, y: 0 }));
-      } else {
-        gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
-
-        ScrollTrigger.create({
-          id: 'pth',
-          trigger: '.pth',
-          start: 'top top',
-          end: 'bottom bottom',
-          pin: '.pth .stage',
-          pinSpacing: false,
-          scrub: 0.6,
-          onUpdate(s) {
-            const pr = s.progress;
-            gsap.set(p, { strokeDashoffset: len * (1 - pr) });
-            if (p.getPointAtLength) {
-              const pt = p.getPointAtLength(len * pr);
-              if (dot) {
-                dot.style.left = (pt.x / 10) + '%';
-                dot.style.top = (pt.y / 8) + '%';
-              }
+      ScrollTrigger.create({
+        trigger: '.pth',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: true,
+        onUpdate(s) {
+          const pr = s.progress;
+          gsap.set(p, { strokeDashoffset: len * (1 - pr) });
+          if (p.getPointAtLength) {
+            const pt = p.getPointAtLength(len * pr);
+            if (dot) {
+              dot.style.left = (pt.x / 10) + '%';
+              dot.style.top = (pt.y / 8) + '%';
             }
-            labs.forEach((l, i) => {
-              const on = pr > marks[i];
-              gsap.to(l, { opacity: on ? 1 : 0, y: on ? 0 : 20, duration: 0.35, overwrite: true });
-            });
           }
-        });
-      }
+          labs.forEach((l, i) => {
+            const on = pr > marks[i];
+            gsap.to(l, { opacity: on ? 1 : 0, y: on ? 0 : 20, duration: 0.4, overwrite: true });
+          });
+        }
+      });
     }
 
     // 2. Dynamic live statistics counters with theme-flip
     document.querySelectorAll('.lt [data-n]').forEach((el) => {
       const targetVal = +el.dataset.n;
-      if (still) {
-        el.textContent = targetVal + (el.dataset.n === '100' ? '%' : '+');
-        return;
-      }
       const o = { v: 0 };
       gsap.to(o, {
         v: targetVal,
@@ -1256,31 +1237,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Circle reveal section transition seamlessly revealing Founders
     const cr = document.getElementById('cr');
     if (cr) {
-      if (still) {
-        gsap.set('.cr .b', { clipPath: 'circle(150% at 50% 50%)', webkitClipPath: 'circle(150% at 50% 50%)' });
-        gsap.set('.cr-founders-title', { opacity: 1, y: 0 });
-        gsap.set('.cr .team-card', { opacity: 1, y: 0 });
-      } else {
-        const crTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: '.cr',
-            start: 'top top',
-            end: '+=100%',
-            pin: true,
-            scrub: 0.6
-          }
-        });
+      const crTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: '.cr',
+          start: 'top top',
+          end: '+=100%',
+          pin: true,
+          scrub: 0.6
+        }
+      });
 
-        crTl
-          .to('.cr .a h2', { scale: 0.88, opacity: 0.2, ease: 'none' }, 0)
-          .to('.cr .b', {
-            clipPath: 'circle(150% at 50% 50%)',
-            webkitClipPath: 'circle(150% at 50% 50%)',
-            ease: 'none'
-          }, 0)
-          .from('.cr-founders-title', { y: 25, opacity: 0, duration: 0.4, ease: 'power2.out' }, 0.2)
-          .from('.cr .team-card', { y: 40, opacity: 0, stagger: 0.1, duration: 0.5, ease: 'power2.out' }, 0.3);
-      }
+      crTl
+        .to('.cr .a h2', { scale: 0.88, opacity: 0.2, ease: 'none' }, 0)
+        .to('.cr .b', { clipPath: 'circle(150% at 50% 50%)', ease: 'none' }, 0)
+        .from('.cr-founders-title', { y: 25, opacity: 0, duration: 0.4, ease: 'power2.out' }, 0.2)
+        .from('.cr .team-card', { y: 40, opacity: 0, stagger: 0.1, duration: 0.5, ease: 'power2.out' }, 0.3);
     }
   })();
 
@@ -1291,7 +1262,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof gsap === 'undefined') return;
     if (typeof ScrollTrigger !== 'undefined') {
       gsap.registerPlugin(ScrollTrigger);
-      ScrollTrigger.config({ ignoreMobileResize: true });
       if (window.lenis) {
         window.lenis.on('scroll', ScrollTrigger.update);
       }
@@ -1347,7 +1317,7 @@ document.addEventListener('DOMContentLoaded', () => {
             opacity: 0,
             duration: 1.1,
             ease: 'elastic.out(1, 0.5)',
-            scrollTrigger: { trigger: '#cta', start: 'top 95%', once: true }
+            scrollTrigger: { trigger: '#cta', start: 'top 92%', once: true }
           });
         }
         gsap.fromTo(
@@ -1682,17 +1652,5 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('pageshow', restoreActiveSection);
   window.addEventListener('load', () => {
     window.setTimeout(restoreActiveSection, 50);
-    window.setTimeout(() => {
-      if (typeof ScrollTrigger !== 'undefined') {
-        ScrollTrigger.refresh();
-      }
-    }, 100);
-  });
-  window.addEventListener('orientationchange', () => {
-    window.setTimeout(() => {
-      if (typeof ScrollTrigger !== 'undefined') {
-        ScrollTrigger.refresh();
-      }
-    }, 200);
   });
 });
