@@ -951,52 +951,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const its = Array.from(craftedTrack.querySelectorAll('.it'));
     // Stagger config: [start, duration, from-offset-x (vw), from-offset-y (vh)]
     const cfg = [
-      [0.06, 0.24, -5, 0],
-      [0.18, 0.24, 0, -9],
-      [0.30, 0.24, -4, 9],
-      [0.42, 0.24, 0, 10],
-      [0.54, 0.26, 6, 0]
+      [0.02, 0.32, -5, 0],
+      [0.14, 0.32, 0, -9],
+      [0.26, 0.32, -4, 9],
+      [0.38, 0.32, 0, 10],
+      [0.50, 0.35, 6, 0]
     ];
-    const reduceMotion = prefersReducedMotion;
     function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
     function clampVal(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
 
-    function updateCrafted() {
-      const rect = craftedTrack.getBoundingClientRect();
-      // Skip updates if track is far out of view
-      if (rect.bottom < -100 || rect.top > window.innerHeight + 100) return;
-
-      const maxScroll = craftedTrack.offsetHeight - window.innerHeight;
-      const scrolled = -rect.top;
-      // Map progress so all 5 photos finish right as track completes, or active by default on compact mobile
-      const p = maxScroll > 0 ? clampVal(scrolled / (maxScroll * 0.94)) : 1;
-
-      its.forEach((el, i) => {
-        const c = cfg[i];
-        const t = reduceMotion ? (p > c[0] ? 1 : 0) : easeOutCubic(clampVal((p - c[0]) / c[1]));
-        el.style.opacity = t;
-        el.style.transform = `translate3d(${c[2] * (1 - t)}vw, ${c[3] * (1 - t)}vh, 0) scale(${0.9 + 0.1 * t})`;
+    if (prefersReducedMotion || window.innerWidth <= 900) {
+      its.forEach((el) => {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
       });
-
-      // Animate title entrance when track reaches 80% of viewport height
-      if (rect.top <= window.innerHeight * 0.8) {
-        craftedStage.classList.add('go');
-      }
-      if (craftedHint) {
-        craftedHint.classList.toggle('off', scrolled > 60);
-      }
+      craftedStage.classList.add('go');
+    } else if (typeof ScrollTrigger !== 'undefined') {
+      ScrollTrigger.create({
+        id: 'crafted',
+        trigger: '#crafted-track',
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 0.5,
+        onUpdate(self) {
+          const p = self.progress;
+          its.forEach((el, i) => {
+            const c = cfg[i];
+            const t = easeOutCubic(clampVal((p - c[0]) / c[1]));
+            el.style.opacity = t;
+            el.style.transform = `translate3d(${c[2] * (1 - t)}vw, ${c[3] * (1 - t)}vh, 0) scale(${0.9 + 0.1 * t})`;
+          });
+          if (p > 0.04) {
+            craftedStage.classList.add('go');
+          }
+          if (craftedHint) {
+            craftedHint.classList.toggle('off', p > 0.15);
+          }
+        }
+      });
     }
-
-    function onScrollCrafted() {
-      updateCrafted();
-    }
-
-    window.addEventListener('scroll', onScrollCrafted, { passive: true });
-    window.addEventListener('resize', onScrollCrafted);
-    if (window.lenis) {
-      window.lenis.on('scroll', onScrollCrafted);
-    }
-    updateCrafted();
   }
 
   // --------------------------------------------------------------------------
@@ -1182,7 +1175,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // Capabilities & Services: SVG Path + Counters + Circle Reveal (Snippet 1)
+  // Capabilities & Services: SVG Path + Unified Dark-to-Light Transition + Live Stats (Snippet 1)
   // --------------------------------------------------------------------------
   (function initServicesAndReveal() {
     if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
@@ -1192,66 +1185,127 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const still = prefersReducedMotion;
-
-    // 1. SVG line draws itself, a dot rides along it, labels pop in on the way
+    const servicesEl = document.getElementById('services');
+    const pinStage = document.getElementById('services-pin-stage');
     const p = document.getElementById('p');
-    if (p) {
-      const len = p.getTotalLength ? p.getTotalLength() : 1800;
-      const dot = document.querySelector('.pth .dot');
-      const labs = gsap.utils.toArray('.pth .lab');
-      const marks = [0.03, 0.28, 0.52, 0.82];
+    const dot = document.querySelector('.pth .dot');
+    const labs = gsap.utils.toArray('.pth .lab');
+    const pthEl = document.querySelector('.pth');
+    const ltEl = document.getElementById('lt');
+    const marks = [0.03, 0.28, 0.58, 0.94];
+    const len = p && p.getTotalLength ? p.getTotalLength() : 1800;
 
-      if (still) {
-        gsap.set(p, { strokeDasharray: 'none', strokeDashoffset: 0 });
-        labs.forEach((l) => gsap.set(l, { opacity: 1, y: 0 }));
-      } else {
-        gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
-
-        ScrollTrigger.create({
-          id: 'pth',
-          trigger: '.pth',
-          start: 'top top',
-          end: 'bottom bottom',
-          pin: '.pth .stage',
-          pinSpacing: false,
-          scrub: 0.6,
-          onUpdate(s) {
-            const pr = s.progress;
-            gsap.set(p, { strokeDashoffset: len * (1 - pr) });
-            if (p.getPointAtLength) {
-              const pt = p.getPointAtLength(len * pr);
-              if (dot) {
-                dot.style.left = (pt.x / 10) + '%';
-                dot.style.top = (pt.y / 8) + '%';
-              }
-            }
-            labs.forEach((l, i) => {
-              const on = pr > marks[i];
-              gsap.to(l, { opacity: on ? 1 : 0, y: on ? 0 : 20, duration: 0.35, overwrite: true });
-            });
+    let countersAnimated = false;
+    function animateCounters() {
+      document.querySelectorAll('.lt [data-n]').forEach((el) => {
+        const targetVal = +el.dataset.n;
+        const o = { v: 0 };
+        gsap.to(o, {
+          v: targetVal,
+          duration: 1.8,
+          ease: 'power2.out',
+          overwrite: true,
+          onUpdate: () => {
+            el.textContent = Math.round(o.v) + (el.dataset.n === '100' ? '%' : '+');
           }
         });
-      }
+      });
     }
 
-    // 2. Dynamic live statistics counters with theme-flip
-    document.querySelectorAll('.lt [data-n]').forEach((el) => {
-      const targetVal = +el.dataset.n;
-      if (still) {
-        el.textContent = targetVal + (el.dataset.n === '100' ? '%' : '+');
-        return;
-      }
-      const o = { v: 0 };
-      gsap.to(o, {
-        v: targetVal,
-        duration: 2,
-        ease: 'power2.out',
-        onUpdate: () => {
-          el.textContent = Math.round(o.v) + (el.dataset.n === '100' ? '%' : '+');
-        },
-        scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+    function resetCounters() {
+      document.querySelectorAll('.lt [data-n]').forEach((el) => {
+        el.textContent = '0' + (el.dataset.n === '100' ? '%' : '+');
       });
-    });
+    }
+
+    function clampVal(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+
+    if (still) {
+      if (p) gsap.set(p, { strokeDasharray: 'none', strokeDashoffset: 0 });
+      labs.forEach((l) => gsap.set(l, { opacity: 1, y: 0 }));
+      if (servicesEl) {
+        servicesEl.style.setProperty('--services-bg', '#E5E5E5');
+        servicesEl.style.setProperty('--services-hero-text', '#0c0b0a');
+        servicesEl.style.setProperty('--services-shadow-alpha', '0');
+        servicesEl.style.setProperty('--services-ghost-alpha', '0');
+      }
+      if (pthEl) pthEl.style.transform = 'translate3d(0, -100%, 0)';
+      if (ltEl) ltEl.style.transform = 'translate3d(0, 0, 0)';
+      animateCounters();
+    } else if (servicesEl && pinStage && p) {
+      gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+
+      ScrollTrigger.create({
+        id: 'servicesTransition',
+        trigger: '#services',
+        start: 'top top',
+        end: 'bottom bottom',
+        pin: '#services-pin-stage',
+        pinSpacing: false,
+        scrub: 0.6,
+        onUpdate(s) {
+          const pr = s.progress;
+
+          // Phase 1: Draw SVG path and travel dot (0.00 to 0.60)
+          const pathPr = clampVal(pr / 0.60);
+          gsap.set(p, { strokeDashoffset: len * (1 - pathPr) });
+          if (p.getPointAtLength) {
+            const pt = p.getPointAtLength(len * pathPr);
+            if (dot) {
+              dot.style.left = (pt.x / 10) + '%';
+              dot.style.top = (pt.y / 8) + '%';
+            }
+          }
+
+          // Hero discipline labels pop in sequence along path
+          labs.forEach((l, i) => {
+            const on = pathPr > marks[i];
+            gsap.to(l, { opacity: on ? 1 : 0, y: on ? 0 : 20, duration: 0.3, overwrite: true });
+          });
+
+          // Phase 2 & 3: Continuous scene lighting & vertical flow transition (0.60 to 1.00)
+          // t interpolates smoothly from 0 to 1 between 0.60 and 0.88; held at 1.00 from 0.88 to 1.00
+          const t = clampVal((pr - 0.60) / 0.28);
+
+          // 1. Scene positions: hero scrolls up naturally as stats rise in from bottom of same continuous canvas
+          if (pthEl) {
+            pthEl.style.transform = `translate3d(0, ${-100 * t}%, 0)`;
+          }
+          if (ltEl) {
+            ltEl.style.transform = `translate3d(0, ${100 * (1 - t)}%, 0)`;
+          }
+
+          // 2. Continuous color interpolation driven by the single progress value t:
+          // Background: dark #1c1c1e (28, 28, 30) -> light #E5E5E5 (229, 229, 229)
+          const bgR = Math.round(28 + t * (229 - 28));
+          const bgG = Math.round(28 + t * (229 - 28));
+          const bgB = Math.round(30 + t * (229 - 30));
+
+          // Hero label text: white #ffffff (255, 255, 255) -> dark #0c0b0a (12, 11, 10)
+          const heroR = Math.round(255 - t * (255 - 12));
+          const heroG = Math.round(255 - t * (255 - 11));
+          const heroB = Math.round(255 - t * (255 - 10));
+
+          // Text shadow and ghost line fade out as background brightens
+          const shadowA = (0.6 * (1 - t)).toFixed(2);
+          const ghostA = (0.12 * (1 - t)).toFixed(2);
+
+          servicesEl.style.setProperty('--services-bg', `rgb(${bgR}, ${bgG}, ${bgB})`);
+          servicesEl.style.setProperty('--services-hero-text', `rgb(${heroR}, ${heroG}, ${heroB})`);
+          servicesEl.style.setProperty('--services-shadow-alpha', shadowA);
+          servicesEl.style.setProperty('--services-ghost-alpha', ghostA);
+
+          // 3. Trigger live statistics counter animation once stats enter view
+          if (t >= 0.45 && !countersAnimated) {
+            countersAnimated = true;
+            animateCounters();
+          } else if (pr < 0.20 && countersAnimated) {
+            countersAnimated = false;
+            resetCounters();
+          }
+        }
+      });
+    }
 
     // 3. Circle reveal section transition seamlessly revealing Founders
     const cr = document.getElementById('cr');
