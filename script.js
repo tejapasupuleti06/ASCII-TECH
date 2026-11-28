@@ -1252,39 +1252,25 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // 3. Circle reveal section transition directly into Founders section
+    // 3. Circle reveal section transition seamlessly revealing Founders
     const cr = document.getElementById('cr');
     if (cr) {
-      gsap.timeline({
+      const crTl = gsap.timeline({
         scrollTrigger: {
           trigger: '.cr',
           start: 'top top',
-          end: '+=120%',
+          end: '+=100%',
           pin: true,
           scrub: 0.6
         }
-      })
-        .to('.cr .a h2', { scale: 0.85, opacity: 0.3, ease: 'none' }, 0)
-        .to('.cr .b', { clipPath: 'circle(85% at 50% 60%)', ease: 'none' }, 0)
-        .from('.cr .b h2', { yPercent: 40, opacity: 0, ease: 'power2.out' }, 0.3);
-    }
+      });
 
-    // 4. Founders slide in after the circle reveal (Snippet 1)
-    gsap.from('.team .t', {
-      y: 70,
-      opacity: 0,
-      duration: 1,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: '.team', start: 'top 70%', once: true }
-    });
-    gsap.from('.team .l', {
-      y: 120,
-      opacity: 0,
-      duration: 1.2,
-      delay: 0.15,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: '.team', start: 'top 70%', once: true }
-    });
+      crTl
+        .to('.cr .a h2', { scale: 0.88, opacity: 0.2, ease: 'none' }, 0)
+        .to('.cr .b', { clipPath: 'circle(150% at 50% 50%)', ease: 'none' }, 0)
+        .from('.cr-founders-title', { y: 25, opacity: 0, duration: 0.4, ease: 'power2.out' }, 0.2)
+        .from('.cr .team-card', { y: 40, opacity: 0, stagger: 0.1, duration: 0.5, ease: 'power2.out' }, 0.3);
+    }
   })();
 
   // --------------------------------------------------------------------------
