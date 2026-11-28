@@ -373,22 +373,35 @@ document.addEventListener('DOMContentLoaded', () => {
           pointer.presence += ((pointer.active ? 1 : 0) - pointer.presence) * pe;
           if (!pointer.active && pointer.presence < 0.002) pointer.presence = 0;
           const k = pointer.presence * Math.min(1, hover);
-          const idleYaw = (Math.sin(tIdle * 0.21) * 3 + Math.sin(tIdle * 0.13 + 2) * 1.5) * DEG;
-          const idleRoll = Math.sin(tIdle * 0.17 + 1) * 1.8 * DEG;
-          const idleLift = Math.sin(tIdle * 0.11) * 0.12;
-          const yawT = idleYaw * (1 - k) + pointer.nx * STEER_YAW * hover * k;
-          const liftT = idleLift * (1 - k) + -pointer.ny * STEER_LIFT * hover * k;
-          const rollT = idleRoll * (1 - k) - yawT * 0.55 * k;
-          if (!cam.init) {
-            cam.yaw = yawT;
-            cam.roll = rollT;
-            cam.lift = liftT;
+
+          // On mobile devices, fly strictly straight forward (yaw = 0, roll = 0, no lateral wobble).
+          // On desktop/laptop, cursor steering directs the flight path.
+          const isMobileDevice = window.innerWidth <= 768 || window.matchMedia('(pointer: coarse)').matches || ('ontouchstart' in window);
+          const idleYaw = isMobileDevice ? 0 : (Math.sin(tIdle * 0.21) * 3 + Math.sin(tIdle * 0.13 + 2) * 1.5) * DEG;
+          const idleRoll = isMobileDevice ? 0 : Math.sin(tIdle * 0.17 + 1) * 1.8 * DEG;
+          const idleLift = isMobileDevice ? 0 : Math.sin(tIdle * 0.11) * 0.12;
+
+          const yawT = isMobileDevice ? 0 : (idleYaw * (1 - k) + pointer.nx * STEER_YAW * hover * k);
+          const liftT = isMobileDevice ? 0 : (idleLift * (1 - k) + -pointer.ny * STEER_LIFT * hover * k);
+          const rollT = isMobileDevice ? 0 : (idleRoll * (1 - k) - yawT * 0.55 * k);
+
+          if (isMobileDevice) {
+            cam.yaw = 0;
+            cam.roll = 0;
+            cam.lift = 0;
             cam.init = true;
+          } else {
+            if (!cam.init) {
+              cam.yaw = yawT;
+              cam.roll = rollT;
+              cam.lift = liftT;
+              cam.init = true;
+            }
+            const ce = 1 - Math.exp(-dt * 2.5);
+            cam.yaw += (yawT - cam.yaw) * ce;
+            cam.roll += (rollT - cam.roll) * ce;
+            cam.lift += (liftT - cam.lift) * ce;
           }
-          const ce = 1 - Math.exp(-dt * 2.5);
-          cam.yaw += (yawT - cam.yaw) * ce;
-          cam.roll += (rollT - cam.roll) * ce;
-          cam.lift += (liftT - cam.lift) * ce;
 
           const camY = Math.max(0.35, eye * (1 + cam.lift));
           const pitch = BASE_PITCH + (camY / EYE_HEIGHT - 1) * 2.2 * DEG;
@@ -1140,189 +1153,244 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------------------------------------------------------------------------
-  // Capabilities & Services: Hover Image Reveal (Originkit)
+  // Capabilities & Services Section Interaction (Animated ASCII Symbols)
   // --------------------------------------------------------------------------
-  (function initHoverImageReveal() {
-    const container = document.getElementById('hover-image-reveal');
-    const floatingCard = document.getElementById('reveal-floating-card');
-    const textItems = document.querySelectorAll('.reveal-text-item');
-    const itemsList = document.querySelector('.reveal-items-list');
-    const imageItems = document.querySelectorAll('.reveal-image-item');
-    const servicesSection = document.getElementById('services');
+  const serviceRows = document.querySelectorAll('.service-row');
+  const asciiSymbols = document.querySelectorAll('.ascii-preview-stage .s');
 
-    if (!container || !floatingCard || !textItems.length) return;
+  if (serviceRows.length) {
+    const activateService = (row) => {
+      if (row.classList.contains('is-active')) return;
 
-    let hoveredIndex = null;
-    let targetX = 0;
-    let targetY = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let vx = 0;
-    let vy = 0;
-    let isMoving = false;
-    let isSectionVisible = true;
-    let lastTime = performance.now();
+      serviceRows.forEach((r) => {
+        r.classList.remove('is-active');
+        r.setAttribute('aria-pressed', 'false');
+      });
 
-    // Framer Motion spring physics matching config: stiffness 60, damping 28, mass 0.5
-    const stiffness = 60;
-    const damping = 28;
-    const mass = 0.5;
+      row.classList.add('is-active');
+      row.setAttribute('aria-pressed', 'true');
 
-    function updateImages(index) {
-      imageItems.forEach((img, i) => {
-        img.classList.remove('pos-above', 'pos-current', 'pos-below');
-        if (index === null) {
-          img.classList.add('pos-below');
-        } else if (i < index) {
-          img.classList.add('pos-above');
-        } else if (i === index) {
-          img.classList.add('pos-current');
+      const asciiId = row.getAttribute('data-ascii') || 's1';
+
+      // Switch active ASCII Symbol block
+      asciiSymbols.forEach((s) => {
+        s.classList.remove('is-active');
+      });
+      const activeSymbol = document.getElementById(`ascii-${asciiId}`);
+      if (activeSymbol) {
+        activeSymbol.classList.add('is-active');
+      }
+    };
+
+    serviceRows.forEach((row) => {
+      row.addEventListener('mouseenter', () => activateService(row));
+      row.addEventListener('focus', () => activateService(row));
+      row.addEventListener('click', () => activateService(row));
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          activateService(row);
+        }
+      });
+    });
+  }
+
+  // --------------------------------------------------------------------------
+  // ASCII Donut Animation for Branding Service
+  // --------------------------------------------------------------------------
+  (function initAsciiDonut() {
+    const el = document.getElementById('donut');
+    if (!el) return;
+    const W = 64, H = 28, ch = '.,-~:;=!*#$@';
+    let A = 0, B = 0, lastDonutT = 0;
+
+    function renderDonutFrame() {
+      const b = new Array(W * H).fill(' ');
+      const z = new Array(W * H).fill(0);
+      const s = Math.sin, c0 = Math.cos;
+      for (let j = 0; j < 6.28; j += 0.08) {
+        for (let i = 0; i < 6.28; i += 0.035) {
+          const c = s(i), d = c0(j), e = s(A), f = s(j), g = c0(A), h = d + 2,
+                D = 1 / (c * h * e + f * g + 5), l = c0(i), m = c0(B), n = s(B), t = c * h * g - f * e,
+                x = 0 | (W / 2 + 34 * D * (l * h * m - t * n)),
+                y = 0 | (H / 2 + 16 * D * (l * h * n + t * m)),
+                o = x + W * y,
+                N = 0 | (8 * ((f * e - c * d * g) * m - c * d * e - f * g - l * d * n));
+          if (y >= 0 && y < H && x >= 0 && x < W && D > z[o]) {
+            z[o] = D;
+            b[o] = ch[N > 0 ? N : 0];
+          }
+        }
+      }
+      let out = '';
+      for (let k = 0; k < W * H; k++) {
+        out += b[k];
+        if (k % W === W - 1) out += '\n';
+      }
+      el.textContent = out;
+      A += 0.04;
+      B += 0.025;
+    }
+
+    renderDonutFrame();
+
+    if (!prefersReducedMotion) {
+      let isDonutVisible = false;
+      const servicesSection = document.getElementById('services');
+      if ('IntersectionObserver' in window && servicesSection) {
+        const donutObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            isDonutVisible = entry.isIntersecting;
+          });
+        }, { threshold: 0.05 });
+        donutObserver.observe(servicesSection);
+      } else {
+        isDonutVisible = true;
+      }
+
+      function donutLoop(t) {
+        if (isDonutVisible && (t - lastDonutT > 40)) {
+          renderDonutFrame();
+          lastDonutT = t;
+        }
+        requestAnimationFrame(donutLoop);
+      }
+      requestAnimationFrame(donutLoop);
+    }
+  })();
+
+  // --------------------------------------------------------------------------
+  // Contact CTA: Let's talk · Start a project (GSAP Scramble, Liquid Fill, Burst)
+  // --------------------------------------------------------------------------
+  (function initContactCta() {
+    if (typeof gsap === 'undefined') return;
+    if (typeof ScrollTrigger !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+      if (window.lenis) {
+        window.lenis.on('scroll', ScrollTrigger.update);
+      }
+    }
+
+    const still = prefersReducedMotion;
+    const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    if (!still) {
+      /* 1. ASCII scramble-decode when the section scrolls into view */
+      const G = '01#@$%&*+<>/\\|{}[]';
+      function scramble(el, delay) {
+        const txt = el.dataset.t || (el.dataset.t = el.textContent);
+        const n = txt.length;
+        const o = { p: 0 };
+        gsap.to(o, {
+          p: 1,
+          delay: delay || 0,
+          duration: 0.9 + n * 0.03,
+          ease: 'none',
+          onUpdate() {
+            const done = Math.floor(o.p * n);
+            el.textContent = txt
+              .split('')
+              .map((c, i) => (c === ' ' ? ' ' : i < done ? c : G[Math.floor(Math.random() * G.length)]))
+              .join('');
+          },
+          onComplete() {
+            el.textContent = txt;
+          }
+        });
+      }
+
+      document.querySelectorAll('[data-scr]').forEach((el, i) => {
+        if (typeof ScrollTrigger !== 'undefined') {
+          ScrollTrigger.create({
+            trigger: el,
+            start: 'top 88%',
+            once: true,
+            onEnter: () => scramble(el, i * 0.15)
+          });
         } else {
-          img.classList.add('pos-below');
+          scramble(el, i * 0.15);
         }
       });
-    }
 
-    function setHovered(index) {
-      hoveredIndex = index;
-      if (index !== null) {
-        floatingCard.classList.add('is-visible');
-        if (itemsList) itemsList.classList.add('has-active');
-        textItems.forEach((item, i) => {
-          if (i === index) {
-            item.classList.add('is-hovered');
-            item.setAttribute('aria-expanded', 'true');
-          } else {
-            item.classList.remove('is-hovered');
-            item.setAttribute('aria-expanded', 'false');
-          }
-        });
-        updateImages(index);
-      } else {
-        floatingCard.classList.remove('is-visible');
-        if (itemsList) itemsList.classList.remove('has-active');
-        textItems.forEach((item) => {
-          item.classList.remove('is-hovered');
-          item.setAttribute('aria-expanded', 'false');
-        });
-        updateImages(null);
-      }
-    }
-
-    function onPointerMove(e) {
-      const rect = container.getBoundingClientRect();
-      const cardWidth = floatingCard.offsetWidth || 300;
-      const cardHeight = floatingCard.offsetHeight || 400;
-
-      // Default offsetX = 200, offsetY = 0 from Originkit
-      let offsetX = 200;
-      if (window.innerWidth < 900) {
-        offsetX = 0; // centered horizontally on mobile/touch
-      }
-
-      const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-      const clientY = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-
-      const mouseX = clientX - rect.left;
-      const mouseY = clientY - rect.top;
-
-      // Boundary clamping inside container
-      const minX = cardWidth / 2 + 10;
-      const maxX = Math.max(minX, rect.width - cardWidth / 2 - 10);
-      const minY = cardHeight / 2 + 10;
-      const maxY = Math.max(minY, rect.height - cardHeight / 2 - 10);
-
-      targetX = Math.max(minX, Math.min(maxX, mouseX + offsetX));
-      targetY = Math.max(minY, Math.min(maxY, mouseY));
-
-      if (!isMoving) {
-        isMoving = true;
-        if (currentX === 0 && currentY === 0) {
-          currentX = targetX;
-          currentY = targetY;
+      /* 2. Button pops in with a bounce, ring pulses forever */
+      const ctaBtn = document.getElementById('cta');
+      if (ctaBtn) {
+        if (typeof ScrollTrigger !== 'undefined') {
+          gsap.from('#cta', {
+            scale: 0.4,
+            opacity: 0,
+            duration: 1.1,
+            ease: 'elastic.out(1, 0.5)',
+            scrollTrigger: { trigger: '#cta', start: 'top 92%', once: true }
+          });
         }
-        lastTime = performance.now();
-        requestAnimationFrame(tick);
-      }
-    }
+        gsap.fromTo(
+          '.cta-btn-wrap .ring',
+          { scale: 1, opacity: 0.5 },
+          { scale: 1.25, opacity: 0, duration: 1.8, repeat: -1, ease: 'power2.out' }
+        );
 
-    function tick(now) {
-      if (!isSectionVisible) {
-        isMoving = false;
-        return;
-      }
+        if (fine) {
+          const fill = ctaBtn.querySelector('.fill');
+          const lblWrap = ctaBtn.querySelector('.lbl');
+          const lbls = ctaBtn.querySelectorAll('.lbl span');
 
-      const dt = Math.min((now - lastTime) / 1000, 0.05) || 0.016;
-      lastTime = now;
+          /* 3. Magnetic pull, label drifting */
+          ctaBtn.addEventListener('mousemove', (e) => {
+            const r = ctaBtn.getBoundingClientRect();
+            const dx = e.clientX - r.left - r.width / 2;
+            const dy = e.clientY - r.top - r.height / 2;
+            gsap.to(ctaBtn, { x: dx * 0.35, y: dy * 0.5, duration: 0.4, ease: 'power3.out' });
+            if (lblWrap) {
+              gsap.to(lblWrap, { x: dx * 0.12, y: dy * 0.2, duration: 0.4 });
+            }
+          });
 
-      if (prefersReducedMotion) {
-        currentX = targetX;
-        currentY = targetY;
-        vx = 0;
-        vy = 0;
-      } else {
-        // 2nd-order spring physics simulation (stiffness: 60, damping: 28, mass: 0.5)
-        const fx = -stiffness * (currentX - targetX) - damping * vx;
-        const fy = -stiffness * (currentY - targetY) - damping * vy;
+          /* 4. Liquid fill rises + label rolls to twin */
+          ctaBtn.addEventListener('mouseenter', () => {
+            if (fill) gsap.to(fill, { yPercent: -75, duration: 0.6, ease: 'expo.out' });
+            if (lbls.length) gsap.to(lbls, { yPercent: -100, duration: 0.5, ease: 'expo.out' });
+            gsap.to(ctaBtn, { color: '#0c0b0a', duration: 0.3 });
+          });
 
-        const ax = fx / mass;
-        const ay = fy / mass;
+          ctaBtn.addEventListener('mouseleave', () => {
+            gsap.to(ctaBtn, { x: 0, y: 0, color: '#fff', duration: 0.9, ease: 'elastic.out(1, 0.4)' });
+            if (lblWrap) gsap.to(lblWrap, { x: 0, y: 0, duration: 0.9, ease: 'elastic.out(1, 0.4)' });
+            if (fill) gsap.to(fill, { yPercent: 0, duration: 0.6, ease: 'expo.out' });
+            if (lbls.length) gsap.to(lbls, { yPercent: 0, duration: 0.5, ease: 'expo.out' });
+          });
+        }
 
-        vx += ax * dt;
-        vy += ay * dt;
-
-        currentX += vx * dt;
-        currentY += vy * dt;
-      }
-
-      floatingCard.style.transform = `translate3d(calc(${currentX.toFixed(2)}px - 50%), calc(${currentY.toFixed(2)}px - 50%), 0)`;
-
-      const stillOscillating = Math.abs(vx) > 0.1 || Math.abs(vy) > 0.1 || Math.abs(currentX - targetX) > 0.5 || Math.abs(currentY - targetY) > 0.5;
-
-      if (hoveredIndex !== null || stillOscillating) {
-        requestAnimationFrame(tick);
-      } else {
-        isMoving = false;
-      }
-    }
-
-    container.addEventListener('mousemove', onPointerMove, { passive: true });
-    container.addEventListener('mouseleave', () => {
-      setHovered(null);
-    });
-
-    textItems.forEach((item, index) => {
-      item.addEventListener('mouseenter', () => {
-        setHovered(index);
-      });
-      item.addEventListener('focus', () => {
-        setHovered(index);
-      });
-      item.addEventListener('blur', () => {
-        setHovered(null);
-      });
-      item.addEventListener('touchstart', (e) => {
-        onPointerMove(e);
-        setHovered(index);
-      }, { passive: true });
-      item.addEventListener('click', () => {
-        setHovered(index);
-      });
-    });
-
-    // Pause physics if services section is scrolled off-screen
-    if ('IntersectionObserver' in window && servicesSection) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          isSectionVisible = entry.isIntersecting;
-          if (isSectionVisible && hoveredIndex !== null && !isMoving) {
-            isMoving = true;
-            lastTime = performance.now();
-            requestAnimationFrame(tick);
+        /* 5. Click: burst of accent dots */
+        ctaBtn.addEventListener('click', (e) => {
+          for (let i = 0; i < 14; i++) {
+            const d = document.createElement('i');
+            Object.assign(d.style, {
+              position: 'fixed',
+              left: e.clientX + 'px',
+              top: e.clientY + 'px',
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              background: 'var(--color-accent)',
+              pointerEvents: 'none',
+              zIndex: '9999'
+            });
+            document.body.appendChild(d);
+            const a = (i / 14) * Math.PI * 2;
+            const r = gsap.utils.random(60, 140);
+            gsap.to(d, {
+              x: Math.cos(a) * r,
+              y: Math.sin(a) * r,
+              opacity: 0,
+              scale: 0.2,
+              duration: 0.8,
+              ease: 'power3.out',
+              onComplete: () => d.remove()
+            });
           }
         });
-      }, { threshold: 0.05 });
-      observer.observe(servicesSection);
+      }
     }
   })();
 

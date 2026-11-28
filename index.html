@@ -558,56 +558,113 @@
     </section>
 
 
-    <!-- ================= CAPABILITIES & SERVICES SECTION (Hover Image Reveal — Originkit) ================= -->
+    <!-- ================= CAPABILITIES & SERVICES SECTION ================= -->
     <section class="services-section" id="services" aria-label="Capabilities and Services">
-      <div class="hover-image-reveal" id="hover-image-reveal">
-        <!-- Floating Cursor-Following Image Preview Portal -->
-        <div class="reveal-floating-card" id="reveal-floating-card" aria-hidden="true">
-          <div class="reveal-image-item pos-below" data-index="0">
-            <img src="assets/services/service-websites.webp" alt="Website" class="reveal-img" loading="lazy" />
-          </div>
-          <div class="reveal-image-item pos-below" data-index="1">
-            <img src="assets/services/service-branding.webp" alt="Branding" class="reveal-img" loading="lazy" />
-          </div>
-          <div class="reveal-image-item pos-below" data-index="2">
-            <img src="assets/services/service-graphic-designing.webp" alt="Graphic Designing" class="reveal-img" loading="lazy" />
-          </div>
-          <div class="reveal-image-item pos-below" data-index="3">
-            <img src="assets/services/service-3d-rendering.webp" alt="3D Rendering" class="reveal-img" loading="lazy" />
+      <div class="services-container">
+        <!-- Left Column: Fixed 1:1 Preview Card with Animated ASCII Art -->
+        <div class="services-preview-col">
+          <div class="service-preview-card" id="service-preview-card">
+            <div class="ascii-preview-stage" id="ascii-preview-stage">
+              <!-- Symbol 1: Websites (Circle Wave Rings + Symbol 1) -->
+              <div class="s s1 is-active" id="ascii-s1">
+                <i class="ring circle" style="animation-delay:0s"></i>
+                <i class="ring circle" style="animation-delay:2.4s"></i>
+                <i class="ring circle" style="animation-delay:4.8s"></i>
+                <i class="ring circle" style="animation-delay:7.2s"></i>
+                <img class="sym inv" src="assets/services/ascii-s1.png" alt="Website ASCII Symbol" width="700" height="700" />
+              </div>
+
+              <!-- Symbol 2: Graphic Designing (Square Wave Rings + Symbol 2) -->
+              <div class="s s2" id="ascii-s2">
+                <i class="ring square" style="animation-delay:0s"></i>
+                <i class="ring square" style="animation-delay:2.4s"></i>
+                <i class="ring square" style="animation-delay:4.8s"></i>
+                <i class="ring square" style="animation-delay:7.2s"></i>
+                <img class="sym inv" src="assets/services/ascii-s2.png" alt="Graphic Designing ASCII Symbol" width="700" height="530" />
+              </div>
+
+              <!-- Symbol 3: Branding (Diamond Wave Rings + 3D Torus Donut ASCII) -->
+              <div class="s s3" id="ascii-s3">
+                <i class="ring diamond" style="animation-delay:0s"></i>
+                <i class="ring diamond" style="animation-delay:2.4s"></i>
+                <i class="ring diamond" style="animation-delay:4.8s"></i>
+                <i class="ring diamond" style="animation-delay:7.2s"></i>
+                <pre id="donut" class="sym abs" aria-label="abstract ASCII torus"></pre>
+              </div>
+
+              <!-- Symbol 4: 3D Rendering (Squircle Wave Rings + Symbol 4) -->
+              <div class="s s4" id="ascii-s4">
+                <i class="ring squircle" style="animation-delay:0s"></i>
+                <i class="ring squircle" style="animation-delay:2.4s"></i>
+                <i class="ring squircle" style="animation-delay:4.8s"></i>
+                <i class="ring squircle" style="animation-delay:7.2s"></i>
+                <img class="sym inv" src="assets/services/ascii-s4.png" alt="3D Rendering ASCII Symbol" width="700" height="700" />
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Vertical List of Reveal Items (Originkit) -->
-        <div class="reveal-items-list" role="list">
-          <!-- Item 0: Website -->
-          <div class="reveal-text-item" data-index="0" role="listitem" tabindex="0" aria-label="Website Service">
-            <div class="reveal-text-inner">
-              <span class="reveal-text-line">Website</span>
-              <span class="reveal-text-line reveal-text-clone" aria-hidden="true">Website</span>
+        <!-- Right Column: Service Rows with Hairline Dividers -->
+        <div class="services-list-col" role="region" aria-label="Services list">
+          <div class="services-hairline-group">
+            <div 
+              class="service-row is-active" 
+              tabindex="0" 
+              role="button" 
+              aria-pressed="true" 
+              aria-label="Website service"
+              data-service="website" 
+              data-ascii="s1"
+              data-caption="Crafting immersive digital flagships that convert and inspire."
+            >
+              <div class="service-row-content">
+                <span class="service-row-title">Website</span>
+              </div>
             </div>
-          </div>
 
-          <!-- Item 1: Branding -->
-          <div class="reveal-text-item" data-index="1" role="listitem" tabindex="0" aria-label="Branding Service">
-            <div class="reveal-text-inner">
-              <span class="reveal-text-line">Branding</span>
-              <span class="reveal-text-line reveal-text-clone" aria-hidden="true">Branding</span>
+            <div 
+              class="service-row" 
+              tabindex="0" 
+              role="button" 
+              aria-pressed="false" 
+              aria-label="Graphic Designing service"
+              data-service="graphic-designing" 
+              data-ascii="s2"
+              data-caption="Visual communications and editorial art that command cultural attention."
+            >
+              <div class="service-row-content">
+                <span class="service-row-title">Graphic Designing</span>
+              </div>
             </div>
-          </div>
 
-          <!-- Item 2: Graphic Designing -->
-          <div class="reveal-text-item" data-index="2" role="listitem" tabindex="0" aria-label="Graphic Designing Service">
-            <div class="reveal-text-inner">
-              <span class="reveal-text-line">Graphic Designing</span>
-              <span class="reveal-text-line reveal-text-clone" aria-hidden="true">Graphic Designing</span>
+            <div 
+              class="service-row" 
+              tabindex="0" 
+              role="button" 
+              aria-pressed="false" 
+              aria-label="Branding service"
+              data-service="branding" 
+              data-ascii="s3"
+              data-caption="We create impactful brand identities that connect."
+            >
+              <div class="service-row-content">
+                <span class="service-row-title">Branding</span>
+              </div>
             </div>
-          </div>
 
-          <!-- Item 3: 3D Rendering -->
-          <div class="reveal-text-item" data-index="3" role="listitem" tabindex="0" aria-label="3D Rendering Service">
-            <div class="reveal-text-inner">
-              <span class="reveal-text-line">3D Rendering</span>
-              <span class="reveal-text-line reveal-text-clone" aria-hidden="true">3D Rendering</span>
+            <div 
+              class="service-row" 
+              tabindex="0" 
+              role="button" 
+              aria-pressed="false" 
+              aria-label="3D Rendering service"
+              data-service="3d-rendering" 
+              data-ascii="s4"
+              data-caption="Photorealistic spatial visuals, product renders, and dimensional worlds."
+            >
+              <div class="service-row-content">
+                <span class="service-row-title">3D Rendering</span>
+              </div>
             </div>
           </div>
         </div>
@@ -681,26 +738,19 @@
 
     <!-- ================= FOOTER SECTION ================= -->
     <footer class="footer-section" id="contact" role="contentinfo" aria-label="Site Footer">
-      <!-- Top CTA Banner overlapping the light/dark section boundary -->
-      <div class="footer-cta-container reveal-item">
-        <div class="footer-cta-stacked-wrap">
-          <!-- Offset background layer peeking out up and to the left -->
-          <div class="footer-cta-offset-layer" aria-hidden="true"></div>
-
-          <!-- Main CTA Card in 10% Accent Orange (#FF8C1A) -->
-          <div class="footer-cta-card">
-            <div class="footer-cta-content">
-              <h2 class="footer-cta-title">Ready for a next project?</h2>
-              <p class="footer-cta-subtitle">Let's get started!</p>
-            </div>
-            <div class="footer-cta-action">
-              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=asciisupport@gmail.com" target="_blank" rel="noopener noreferrer" class="footer-cta-btn" aria-label="Contact ASCIITECH">
-                <span>Contact us</span>
-              </a>
-            </div>
+      <!-- Top CTA: Interactive Let's talk · Start a project -->
+      <section class="ft" id="contact-cta" aria-label="Start a project">
+        <div class="ft-inner">
+          <h2 data-scr>Let’s talk</h2>
+          <div class="cta-btn-wrap">
+            <span class="ring"></span>
+            <a class="btn" href="https://mail.google.com/mail/?view=cm&fs=1&to=asciisupport@gmail.com" target="_blank" rel="noopener noreferrer" id="cta" aria-label="Start a project">
+              <i class="fill"></i>
+              <span class="lbl"><span>Start a project</span><span>Start a project</span></span>
+            </a>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- Dark Footer Body with 5 Columns in One Row -->
       <div class="footer-body">
@@ -862,6 +912,8 @@
       window.setTimeout(dismiss, 4500);
     })();
   </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
